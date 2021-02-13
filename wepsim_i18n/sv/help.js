@@ -1,5 +1,5 @@
 /*
- *  Copyright 2015-2020 Felix Garcia Carballeira, Alejandro Calderon Mateos, Javier Prieto Cepeda, Saul Alonso Monsalve
+ *  Copyright 2015-2021 Felix Garcia Carballeira, Alejandro Calderon Mateos, Javier Prieto Cepeda, Saul Alonso Monsalve
  *
  *  This file is part of WepSIM.
  *
@@ -25,6 +25,8 @@
 		'help_01_01':		'Öppna välkomsthandledningen',
 		'Simple usage tutorial':		'Enkel användarhandledning',
 		'help_01_02':		'Öppna den enkla användarhandledningen, för programmering av mikroprogrammering och montering',
+		'Execute example':		'Execute example',
+		'help_01_03':			'Play the execute example tutorial',
 		'Simulator: firmware':		'Simulator: firmware',
 		'help_02_01':		'Hur man arbetar med den fasta programvaran som ska laddas i kontrollminnet',
 		'Microcode format':		'Mikrokod format',

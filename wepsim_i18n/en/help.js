@@ -1,5 +1,5 @@
 /*
- *  Copyright 2015-2020 Felix Garcia Carballeira, Alejandro Calderon Mateos, Javier Prieto Cepeda, Saul Alonso Monsalve
+ *  Copyright 2015-2021 Felix Garcia Carballeira, Alejandro Calderon Mateos, Javier Prieto Cepeda, Saul Alonso Monsalve
  *
  *  This file is part of WepSIM.
  *
@@ -26,6 +26,9 @@
 
 	"Simple usage tutorial":	"Simple usage tutorial",
 	"help_01_02":			"Open the simple usage tutorial, for microprogramming and assembly programming",
+
+	"Execute example":		"Execute example",
+	"help_01_03":			"Play the execute example tutorial",
 
 	"Simulator: firmware":		"Simulator: firmware",
 	"help_02_01":			"How to work with the firmware to be loaded into the control memory",

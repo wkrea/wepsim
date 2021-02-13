@@ -1,5 +1,5 @@
 /*
- *  Copyright 2015-2020 Felix Garcia Carballeira, Alejandro Calderon Mateos, Javier Prieto Cepeda, Saul Alonso Monsalve
+ *  Copyright 2015-2021 Felix Garcia Carballeira, Alejandro Calderon Mateos, Javier Prieto Cepeda, Saul Alonso Monsalve
  *
  *  This file is part of WepSIM.
  *
@@ -36,7 +36,7 @@
 		 restore_cfg() ;
 	    }
 	    else {
-                 reset_cfg() ;
+                 reset_cfg_values() ;
 	    }
 
             return ret ;
@@ -56,7 +56,7 @@
 	    var hwid = simhw_getIdByName(simhw_name) ;
 	    if (hwid < 0)
 	    {
-	        ret.msg = "ERROR: unknown hardware: " + simhw_name + ".\n" ;
+	        ret.msg = "ERROR: unknown hardware: " + simhw_name + ".<br>\n" ;
 	        ret.ok  = false ;
 	        return ret ;
 	    }
@@ -76,6 +76,7 @@
 
         /**
          * Show welcome message.
+         * http://patorjk.com/software/taag/#p=testall&h=0&v=0&f=Delta%20Corps%20Priest%201&t=WepSIM
          */
         function simcore_welcome ( )
         {
@@ -83,12 +84,17 @@
 	        ret.msg = "" ;
 	        ret.ok  = true ;
 
-            // http://patorjk.com/software/taag/#p=display&h=0&v=0&f=Bulbhead&t=WepSIM
-            console.log('   _    _  ____  ____  ___  ____  __  __  ') ;
-            console.log('  ( \\/\\/ )( ___)(  _ \\/ __)(_  _)(  \\/  ) ') ;
-            console.log('   )    (  )__)  )___/\\__ \\ _)(_  )    (  ') ;
-            console.log('  (__/\\__)(____)(__)  (___/(____)(_/\\/\\_) ') ;
-            console.log('                                          ') ;
+            console.log('') ;
+            console.log('██╗    ██╗███████╗██████╗ ███████╗██╗███╗   ███╗') ;
+            console.log('██║    ██║██╔════╝██╔══██╗██╔════╝██║████╗ ████║') ;
+            console.log('██║ █╗ ██║█████╗  ██████╔╝███████╗██║██╔████╔██║') ;
+            console.log('██║███╗██║██╔══╝  ██╔═══╝ ╚════██║██║██║╚██╔╝██║') ;
+            console.log('╚███╔███╔╝███████╗██║     ███████║██║██║ ╚═╝ ██║') ;
+            console.log(' ╚══╝╚══╝ ╚══════╝╚═╝     ╚══════╝╚═╝╚═╝     ╚═╝') ;
+            console.log('') ;
+            console.log('Stable: https://github.com/wepsim/wepsim') ;
+            console.log('Beta:   https://github.com/acaldero/wepsim') ;
+            console.log('') ;
 
             return ret ;
         }
@@ -252,7 +258,8 @@
 		if ( (typeof curr_segments['.ktext'] == "undefined") &&
 		     (typeof curr_segments['.text']  == "undefined") )
 		{
-		    ret.msg = 'code segment .ktext/.text does not exist!\nPlease load some assembly code.' ;
+		    ret.msg = 'code segment .ktext/.text does not exist!<br>\n' +
+                              'Please load some assembly code.<br>' ;
 	            ret.ok = false ;
 		    return ret ;
 		}
@@ -282,7 +289,9 @@
                     ret.msg = "" ;
 
                 // if (MC[reg_maddr] == undefined) -> cannot continue
-                if (typeof simhw_internalState_get('MC', reg_maddr) == "undefined")
+                var curr_MC = simhw_internalState('MC') ;
+                var mcelto  = control_memory_get(curr_MC, reg_maddr) ;
+                if (typeof mcelto === "undefined")
                 {
                     var hex_maddr = "0x" + parseInt(reg_maddr).toString(16) ;
                     ret.ok  = false ;
@@ -297,6 +306,11 @@
                 }
                 if ( (reg_pc <  curr_segments['.text'].end) && (reg_pc >=  curr_segments['.text'].begin)) {
                       return ret;
+                }
+
+                // if (border *text) && (native code) && (reg_maddr === 0) -> can continue
+                if ( (mcelto.is_native) && (0 === reg_maddr) ) {
+                      return ret ;
                 }
 
                 // if (border *text) && (reg_maddr !== 0) -> can continue
@@ -338,12 +352,22 @@
 	    var SIMWARE        = get_simware() ;
             var curr_firm      = simhw_internalState('FIRMWARE') ;
             var curr_segments  = simhw_internalState('segments') ;
+            var curr_MC        = simhw_internalState('MC') ;
             var sim_components = simhw_sim_components() ;
+            var ctrl_states    = simhw_sim_ctrlStates_get() ;
 
-            var pc_name   = simhw_sim_ctrlStates_get().pc.state ;
-	    var pc_state  = simhw_sim_state(pc_name) ;
-            var sp_name   = curr_firm.stackRegister ;
-            var sp_state  = simhw_sim_states().BR[sp_name] ;
+            // get PC and SP
+            var pc_name  = ctrl_states.pc.state ;
+	    var pc_state = simhw_sim_state(pc_name) ;
+
+            var sp_name  = ctrl_states.sp.state ;
+            var sp_state = simhw_sim_state(sp_name) ;
+            if (curr_firm.stackRegister != null)
+            {
+                sp_name  = curr_firm.stackRegister ;
+                sp_state = simhw_sim_states().BR[sp_name] ;
+                ctrl_states.sp.state = 'BR.' + curr_firm.stackRegister ;
+            }
 
             // Hardware (reset)
             for (var elto in sim_components)
@@ -355,26 +379,33 @@
 	    // CPU registers initial values
 	    if ((typeof curr_segments['.ktext'] !== "undefined") && (SIMWARE.labels2.kmain))
 	    {
-	         set_value(pc_state, parseInt(SIMWARE.labels2.kmain));
+	         set_value(pc_state, parseInt(SIMWARE.labels2.kmain)) ;
 	         show_asmdbg_pc() ;
 	    }
 	    else if ((typeof curr_segments['.text'] !== "undefined") && (SIMWARE.labels2.main))
 	    {
-	         set_value(pc_state, parseInt(SIMWARE.labels2.main));
+	         set_value(pc_state, parseInt(SIMWARE.labels2.main)) ;
 	         show_asmdbg_pc() ;
 	    }
 
 	    if ( (typeof curr_segments['.stack'] !== "undefined") && (typeof sp_state !== "undefined") )
 	    {
-	         set_value(sp_state, parseInt(curr_segments['.stack'].end));
+	         set_value(sp_state, parseInt(curr_segments['.stack'].end) & 0xFFFFFFFC) ;
 	    }
 
             // If not NATIVE code, fire one clock signal to initialize at first microinstruction
 	    var new_maddr = get_value(simhw_sim_state('MUXA_MICROADDR')) ;
-	    if (typeof simhw_internalState_get('MC',new_maddr) != "undefined")
-		 var new_mins = simhw_internalState_get('MC',new_maddr) ;
-	    else var new_mins = simhw_sim_state('REG_MICROINS').default_value ;
-	    if (typeof new_mins.NATIVE === "undefined") {
+            var mcelto    = control_memory_get(curr_MC, new_maddr) ;
+	    if (typeof mcelto === "undefined")
+            {
+                mcelto = {
+                            value:     simhw_sim_state('REG_MICROINS').default_value,
+                            is_native: false
+                         } ;
+            }
+	    var new_mins = get_value(mcelto) ;
+
+	    if (false == mcelto.is_native) {
                 compute_general_behavior("CLOCK") ;
 	    }
 
@@ -409,8 +440,6 @@
             compute_general_behavior("CLOCK") ;
 
             // CPU - User Interface
-	    show_states();
-	    show_rf_values();
             show_dbg_mpc();
 
             return ret ;
@@ -427,8 +456,6 @@
             compute_general_behavior("CLOCK") ;
 
             // CPU - User Interface
-	    show_states();
-	    show_rf_values();
             show_dbg_mpc();
 
             return ret ;
@@ -464,6 +491,7 @@
                 var i_clks    = 0 ;
                 var limitless = (options.cycles_limit < 0) ;
                 var cur_addr  = 0 ;
+                var mcelto    = null ;
 
 		do
             	{
@@ -485,7 +513,8 @@
 	            }
 
                     cur_addr = get_value(maddr_state) ;
-                    if (typeof curr_MC[cur_addr] == "undefined")
+                    mcelto   = control_memory_get(curr_MC, cur_addr) ;
+                    if (typeof mcelto === "undefined")
 		    {
 		        ret.msg = "Error: undefined microinstruction at " + cur_addr + "." ;
 		        ret.ok  = false ;
@@ -495,18 +524,12 @@
 		while ( (i_clks < options.cycles_limit) && (0 != cur_addr) );
 
 		// no_error && native -> perform a second clock-tick...
-		if ( 
-		     (true == ret.ok) &&
-		     (typeof curr_MC[cur_addr].NATIVE !== "undefined") 
-		   )
+		if ( (true == ret.ok) && (mcelto.is_native) )
 		{
                     compute_general_behavior("CLOCK") ; // ...instruction
                 }
 
                 // 2.- to show states
-		show_states();
-		show_rf_values();
-
                 if (get_cfg('DBG_level') == "microinstruction") {
                     show_dbg_mpc();
                 }
@@ -568,9 +591,8 @@
 
     	    var ins_executed = 0 ;
     	    while (
-                //       (reg_pc != reg_pc_before)  &&
-                      ( ((reg_pc <  code_end) && (reg_pc >=  code_begin)) ||
-                        ((reg_pc < kcode_end) && (reg_pc >= kcode_begin)) )
+                     ((reg_pc <  code_end) && (reg_pc >=  code_begin)) ||
+                     ((reg_pc < kcode_end) && (reg_pc >= kcode_begin))
                   )
     	    {
 		   // verbosity before

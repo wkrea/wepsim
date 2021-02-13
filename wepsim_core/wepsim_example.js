@@ -1,5 +1,5 @@
 /*
- *  Copyright 2015-2020 Felix Garcia Carballeira, Alejandro Calderon Mateos, Javier Prieto Cepeda, Saul Alonso Monsalve
+ *  Copyright 2015-2021 Felix Garcia Carballeira, Alejandro Calderon Mateos, Javier Prieto Cepeda, Saul Alonso Monsalve
  *
  *  This file is part of WepSIM.
  *
@@ -20,32 +20,70 @@
 
 
     /*
-     * Examples
+     * Example set management
      */
 
-    function wepsim_open_examples_index ( )
+    ws_info.examples = [] ;
+    ws_info.example_set    = [{ "name": "Empty", "url": "", "url_base_asm": "", "url_base_mc": "" }] ;
+    ws_info.example_active = -1 ;
+
+    function wepsim_example_reset ( )
     {
-        $("#container-example1").html(table_examples_html(ws_examples)) ;
+       ws_info.examples = [] ;
+       ws_info.example_active = -1 ;
 
-	i18n_update_tags('examples') ;
-	$('#example1').modal('show') ;
-
-	// stats about ui
-        ga('send', 'event', 'ui', 'ui.dialog', 'ui.dialog.example');
+       webui_toolbar_updateExampleSet() ;
     }
 
-    function wepsim_close_examples ( )
+    function wepsim_example_load ( e_name )
     {
-	$('#example1').modal('hide') ;
+       var jobj = null ;
+
+       // try to load each one
+       for (var i=0; i<ws_info.example_set.length; i++)
+       {
+            if (ws_info.example_set[i].name.toUpperCase() !== e_name.toUpperCase()) { 
+                continue ;
+            }
+            if (typeof ws_info.example_set[i].url === "undefined") { 
+                continue ;
+            }
+
+            jobj = wepsim_url_getJSON(ws_info.example_set[i].url) ;
+	    ws_info.examples = ws_info.examples.concat(jobj) ;
+            ws_info.example_active = i ;
+       }
+
+       webui_toolbar_updateExampleSet() ;
+
+       return ws_info.examples ;
+    }
+
+    function wepsim_example_loadSet ( url_example_set, set_name )
+    {
+       // try to load the set
+       ws_info.example_set = wepsim_url_getJSON(url_example_set) ;
+
+       return ws_info.example_set ;
+    }
+
+    function wepsim_example_getSet ( )
+    {
+       return ws_info.example_set ;
     }
 
 
     /*
-     * Example management
+     * Example UI management
      */
 
     function load_from_example_assembly ( example_id, chain_next_step )
     {
+        if (-1 == ws_info.example_active) {
+            ws_alert("warning: no active example set") ;
+            return ;
+        }
+
 	inputasm.setValue("Please wait...");
 	inputasm.refresh();
 
@@ -67,7 +105,7 @@
              sample_asm = sid[2] ;
         else console.log("warning: example without assembly id") ;
 
-	var url = "examples/assembly/asm-" + sample_asm + ".txt" ;
+        var url = ws_info.example_set[ws_info.example_active].url_base_asm + "asm-" + sample_asm + ".txt" ;
 
 	// do next
         var do_next = function( mcode ) {
@@ -79,6 +117,7 @@
                             var SIMWARE = get_simware() ;
 	                    if (SIMWARE.firmware.length !== 0) {
                                 ok = wepsim_compile_assembly(mcode) ;
+			        inputasm.is_compiled = ok ;
 			    }
 
                             // stop here if error is found
@@ -91,9 +130,12 @@
                             if (true === chain_next_step) {
 				setTimeout(function() {
 					      wsweb_change_workspace_simulator() ;
-                                              show_memories_values();
 				           }, 50);
                              }
+
+			     setTimeout(function() {
+                                           show_memories_values();
+				        }, 500);
 
                              wepsim_notify_success('<strong>INFO</strong>',
                                                    'Example ready to be used.') ;
@@ -111,6 +153,11 @@
 
     function load_from_example_firmware ( example_id, chain_next_step )
     {
+        if (-1 == ws_info.example_active) {
+            ws_alert("warning: no active example set") ;
+            return ;
+        }
+
 	inputfirm.setValue("Please wait...");
 	inputfirm.refresh();
 
@@ -132,7 +179,7 @@
              sample_asm = sid[2] ;
         else console.log("warning: example without assembly id") ;
 
-	var url = "examples/microcode/mc-" + sample_mc + ".txt" ;
+        var url = ws_info.example_set[ws_info.example_active].url_base_mc + "mc-" + sample_mc + ".txt" ;
 	inputfirm.setOption('readOnly', false);
 
 	// do next
@@ -141,6 +188,7 @@
 			   inputfirm.refresh();
 
 			   var ok = wepsim_compile_firmware(mcode);
+			   inputfirm.is_compiled = ok ;
 
                             // stop here if error is found
 			    if (false === ok) {
@@ -156,7 +204,10 @@
                                           }, 50);
                            }
                            else {
-                               show_memories_values();
+                               setTimeout(function() {
+                                             show_memories_values();
+                                             asmdbg_update_assembly() ;
+                                          }, 50);
 
                                wepsim_notify_success('<strong>INFO</strong>',
                                                      'Example ready to be used.') ;
@@ -176,168 +227,21 @@
     function share_example ( m, base_url )
     {
 	 // example information
-	 var e_description = ws_examples[m].description ;
+	 var e_description = ws_info.examples[m].description ;
 	     e_description = e_description.replace(/<[^>]+>/g,'') ;
-	 var e_id          = ws_examples[m].id ;
-	 var e_hw          = ws_examples[m].hardware ;
+	 var e_id          = ws_info.examples[m].id ;
+	 var e_hw          = ws_info.examples[m].hardware ;
 
 	 // share information
 	 var share_title = 'WepSIM example ' + e_id + '...' ;
 	 var share_text  = 'This is a link to the WepSIM example ' + e_id + ' (' + e_description + '):\n' ;
-	 var share_url   = '' + base_url + '?mode=' + e_hw + '&example=' + m ;
+	 var share_url   = '' + base_url + '?mode=' + e_hw + 
+                                           '&examples_set=' + ws_info.example_set[ws_info.example_active].name + 
+                                           '&example=' + m ;
 
-	 return share_infomation('example_' + m, 
-		                 share_title, 
-		                 share_text, 
-		                 share_url) ;
-    }
-
-    function table_examples_html ( examples )
-    {
-       // harware
-       var ahw      = 'ep' ;
-       var ep_modes = wepsim_mode_getAvailableModes() ;
-
-       var mode = get_cfg('ws_mode') ;
-       if ( (mode !== "null") && (! ep_modes.includes(mode)) ) {
-             ahw = mode ;
-       }
-
-       // examples
-       var base_url = get_cfg('base_url') ;
-
-       var fmt_toggle    = "" ;
-       var t_hwmcasm     = "" ;
-       var t_index       = "" ;
-       var e_title       = "" ;
-       var e_type        = "" ;
-       var e_level       = "" ;
-       var e_hw          = "" ;
-       var e_mc          = "" ;
-       var e_asm         = "" ;
-       var e_description = "" ;
-       var e_id          = "" ;
-
-       // first pass: build data
-       var u = "" ;
-       var examples_groupby_type = {} ;
-       for (var m=0; m<examples.length; m++)
-       {
-	       // if (current_hw != example_hw) || (current_mode not in example_modes) -> continue
-	       e_modes = examples[m].modes ;
-	       if (! e_modes.split(",").includes(mode)) {
-		   continue ;
-	       }
-
-	       e_hw = examples[m].hardware ;
-	       if (e_hw !== ahw) {
-		   continue ;
-	       }
-
-	       // add example to the example summary
-	       e_title       = examples[m].title ;
-	       e_type        = examples[m].type  ;
-	       e_level       = examples[m].level ;
-	       e_mc          = examples[m].microcode ;
-	       e_asm         = examples[m].assembly ;
-	       e_description = examples[m].description ;
-	       e_id          = examples[m].id ;
-
-	       t_hwmcasm = e_hw + ":" + e_mc + ":" + e_asm ;
-	       t_index   = (m+1).toString().padStart(2, ' ').replace(/ /g, '&nbsp;') ;
-
-	        if (fmt_toggle === "")
-	            fmt_toggle = "bg-light" ;
-	       else fmt_toggle = "" ;
-
-	            u = "<div class='row py-1 " + fmt_toggle + " user_" + e_level + "'>" +
-                        '<div class="col-sm-auto">' +
-                        '    <span class="badge badge-pill badge-light">' + t_index + '</span>' +
-                        '</div>' +
-                        '<div class="col-sm-3">' +
-                        '     <span style="cursor:pointer;" ' +
-		        '           id="example_' + m + '" ' +
-		        '           onclick="simcore_record_append_pending(); ' +
-		        '                    load_from_example_firmware(\'' + t_hwmcasm + '\', true); ' +
-		        '                    $(\'#example1\').modal(\'hide\'); ' +
-		        '                    return false;" ' +
-		        '           class="btn-like bg-info text-white text-truncate rounded border px-1 mr-2" style="cursor:pointer;" >' + e_title + '</span>' +
-                        '</div>' +
-                        '<div class="col-sm collapse7 show">' +
-                        '    <c>' + e_description + '</c>' +
-                        '</div>' +
-                        '<div class="col-sm-auto">' +
-		        '    <span id="example_reference_' + e_id + '" class="d-none">' + base_url + '?mode=' + mode + '&example=' + m + '</span>' +
-		        '    <div class="btn-group btn-group-md float-right align-top">' +
-                        '           <button type="button" ' +
-		        '                   class="btn btn-md btn-info dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">' +
-                        '              <span class="sr-only">Toggle Dropdown</span>' +
-                        '           </button>' +
-                        '           <div class="dropdown-menu bg-info" style="z-index:1024;">' +
-		        '             <a onclick="simcore_record_append_pending();' +
-		        '                         load_from_example_firmware(\'' + t_hwmcasm + '\', true);' +
-		        '                         $(\'#example1\').modal(\'hide\'); ' +
-		        '                         return false;"' +
-		        '                class="dropdown-item text-white bg-info" href="#"><c><span data-langkey="Load example">Load example</span></c></a>' +
-		        '             <a onclick="simcore_record_append_pending();' +
-		        '                         load_from_example_assembly(\'' + t_hwmcasm + '\', false);' +
-		        '                         $(\'#example1\').modal(\'hide\'); ' +
-		        '                         return false;"' +
-		        '                class="dropdown-item text-white bg-info" href="#"><c><span data-langkey="Load Assembly only">Load Assembly only</span></c></a>' +
-		        '             <a onclick="simcore_record_append_pending();' +
-		        '                         load_from_example_firmware(\'' + t_hwmcasm + '\', false);' +
-		        '                         $(\'#example1\').modal(\'hide\'); ' +
-		        '                         return false;"' +
-		        '                class="dropdown-item text-white bg-info" href="#"><c><span data-langkey="Load Firmware only">Load Firmware only</span></c></a>' +
-		        '             <a onclick="$(\'#example_reference_' + e_id + '\').removeClass(\'d-none\');' +
-		        '                         wepsim_clipboard_CopyFromDiv(\'example_reference_' + e_id + '\');' +
-		        '                         $(\'#example_reference_' + e_id + '\').addClass(\'d-none\');' +
-		        '                         $(\'#example1\').modal(\'hide\'); ' +
-                        '                         return false;"' +
-		        '                class="dropdown-item text-white bg-info" href="#"><c><span data-langkey="Copy reference to clipboard">Copy reference to clipboard</span></c></a>' +
-	                '             <a onclick="$(\'#example1\').modal(\'hide\'); ' +
-                        '                         share_example(\'' + m + '\', \'' + base_url + '\');' +
-                        '                         return false;"' +
-		        '                class="dropdown-item text-white bg-info user_archived" href="#"><c><span data-langkey="Share">Share</span></c></a>' +
-	                '           </div>' +
-		        '    </div>' +
-                        '</div>' +
-	                '</div>' ;
-
-	       if (typeof examples_groupby_type[e_type] === "undefined") {
-		   examples_groupby_type[e_type] = [] ;
-	       }
-	       examples_groupby_type[e_type].push({ 'row':   u,
-		                                    'level': e_level }) ;
-       }
-
-       // second pass: build html
-       var o = "" ;
-           u = "" ;
-       var l = "" ;
-       for (m in examples_groupby_type)
-       {
-	        u = '' ;
-	        l = examples_groupby_type[m][0].level ;
-                for (var n=0; n<examples_groupby_type[m].length; n++)
-                {
-		     u = u + examples_groupby_type[m][n].row ;
-
-		     if (l !== examples_groupby_type[m][n].level) {
-			 l = '' ;
-                     }
-                }
-
-	        o = o + "<div class='col-sm-12 border-bottom border-secondary text-right text-capitalize font-weight-bold bg-white sticky-top user_" + l + "'>" +
-			ahw.toUpperCase() + ": " + m +
-			"</div>" + u ;
-       }
-
-       if (o.trim() === '') {
-	   o = '&lt;<span data-langkey="No examples available...">No examples are available for the selected hardware</span>&gt;' ;
-       }
-
-       o = '<div class="container grid-striped border border-light">' + o + '</div>' ;
-       return o ;
+	 return share_information('example_' + m,
+	 	                  share_title,
+		                  share_text,
+		                  share_url) ;
     }
 

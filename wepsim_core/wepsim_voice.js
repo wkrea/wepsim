@@ -1,5 +1,5 @@
 /*
- *  Copyright 2015-2020 Felix Garcia Carballeira, Alejandro Calderon Mateos, Javier Prieto Cepeda, Saul Alonso Monsalve
+ *  Copyright 2015-2021 Felix Garcia Carballeira, Alejandro Calderon Mateos, Javier Prieto Cepeda, Saul Alonso Monsalve
  *
  *  This file is part of WepSIM.
  *
@@ -31,8 +31,8 @@
          }
 
 	 // setup annyang + speechkitt...
-         annyang.addCommands(wepsim_voice_commands);
-         annyang.addCallback('errorNetwork', 
+         annyang.addCommands(ws_info.voice_commands);
+         annyang.addCallback('errorNetwork',
                              function () {
 	                         annyang.abort() ;
                                  alert('Sorry but some network connection is needed in order to use the voice recognition engine.');

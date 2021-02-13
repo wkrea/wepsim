@@ -1,5 +1,5 @@
 /*
- *  Copyright 2015-2020 Felix Garcia Carballeira, Alejandro Calderon Mateos, Javier Prieto Cepeda, Saul Alonso Monsalve
+ *  Copyright 2015-2021 Felix Garcia Carballeira, Alejandro Calderon Mateos, Javier Prieto Cepeda, Saul Alonso Monsalve
  *
  *  This file is part of WepSIM.
  *
@@ -19,20 +19,22 @@
  */
 
 
-    var ws_config = [] ;
+    ws_info.config_ui = [] ;
 
-    ws_config.push({
+    ws_info.config_ui.push({
                       id:          "select7",
                       type:        "General",
                       u_class:     "",
-                      code_cfg:    "<div class='form-group m-0'>" + i18n_get_select() + "</div>",
+                      code_cfg:    "<div class='form-group m-0'>" +
+                                   i18n_get_selectcfg() +
+                                   "</div>",
                       code_init:   function() {
 			               $('#select7').val(get_cfg('ws_idiom'));
 		                   },
                       description: "<span data-langkey='Idiom for help, examples, etc.'>Idiom for help, examples, etc.</span>"
                    });
 
-    ws_config.push({
+    ws_info.config_ui.push({
                       id:          "slider3",
                       type:        "General",
                       u_class:     "",
@@ -62,7 +64,7 @@
                       description: "<span data-langkey='Notification speed: time before disapear'>Notification speed: time before disapear</span>"
                    });
 
-    ws_config.push({
+    ws_info.config_ui.push({
                       id:          "radio15",
                       type:        "General",
                       u_class:     "",
@@ -92,7 +94,7 @@
                       description: "<span data-langkey='Dark Mode'>Dark Mode</span>"
                    });
 
-    ws_config.push({
+    ws_info.config_ui.push({
                       id:          "radio12",
                       type:        "Execution",
                       u_class:     "",
@@ -123,7 +125,7 @@
                    });
 
 /*
-    ws_config.push({
+    ws_info.config_ui.push({
                       id:          "radio1",
                       type:        "Execution",
                       u_class:     "user_archived",
@@ -150,7 +152,7 @@
                    });
 */
 
-    ws_config.push({
+    ws_info.config_ui.push({
                       id:          "select1",
                       type:        "Execution",
                       u_class:     "",
@@ -162,20 +164,20 @@
                       code_init:   function() {
 			               var elto = get_cfg('ICON_theme') ;
 			               $('#img_select1').attr("src",   "images/stop/stop_" + elto + ".gif");
-			               $('#img_select1').attr("class", breakpoint_icon_list[elto].addclass); 
+			               $('#img_select1').attr("class", ws_info.breakpoint_icon_list[elto].addclass);
 			               $('#breakpointicon1').popover({ html: true,
 					                               content:  wepsim_show_breakpoint_icon_list,
 								       template: wepsim_show_breakpoint_icon_template(),
 					                               sanitizeFn: function(content){return content;}
 								     }).on('shown.bs.popover',
 								            function(shownEvent) {
-								                   wepsim_restore_uicfg();
+								                   wepsim_uicfg_apply();
 								            });
 		                   },
                       description: "<span data-langkey='Breakpoint icon: icon to be used for breakpoints'>Breakpoint icon: icon to be used for breakpoints</span>"
                    });
 
-    ws_config.push({
+    ws_info.config_ui.push({
                       id:          "select6",
                       type:        "Execution",
                       u_class:     "",
@@ -200,7 +202,7 @@
                       description: "<span data-langkey='Limit instructions: number of instructions to be executed'>Limit instructions: number of instructions to be executed</span>"
                    });
 
-    ws_config.push({
+    ws_info.config_ui.push({
                       id:          "select3",
                       type:        "Execution",
                       u_class:     "",
@@ -225,7 +227,7 @@
                       description: "<span data-langkey='Limit instruction ticks: to limit clock ticks'>Limit instruction ticks: to limit clock ticks</span>"
                    });
 
-    ws_config.push({
+    ws_info.config_ui.push({
                       id:          "radio7",
                       type:        "Editor",
                       u_class:     "",
@@ -251,7 +253,7 @@
                       description: "<span data-langkey='Editor theme: light or dark'>Editor theme: light or dark</span>"
                    });
 
-    ws_config.push({
+    ws_info.config_ui.push({
                       id:          "select2",
                       type:        "Editor",
                       u_class:     "",
@@ -276,7 +278,7 @@
                       description: "<span data-langkey='Editor mode: vim, emacs, etc.'>Editor mode: vim, emacs, etc.</span>"
                    });
 
-    ws_config.push({
+    ws_info.config_ui.push({
                       id:          "radio2",
                       type:        "Register file",
                       u_class:     "user_archived",
@@ -285,19 +287,19 @@
 				   "	    <label id='label2-unsigned_16_nofill'" +
 				   "		   class='btn btn-sm btn-light w-50 btn-outline-secondary' style='padding:2 2 2 2;'" +
 				   "		   aria-label='register file display format: hexadecimal'" +
-				   "		   onclick=\"update_cfg('RF_display_format','unsigned_16_nofill'); show_rf_values(); show_states(); show_memories_values();\">" +
+				   "		   onclick=\"update_cfg('RF_display_format','unsigned_16_nofill'); show_memories_values();\">" +
 				   "		<input type='radio' name='options' id='radio2-unsigned_16_nofill'  autocomplete='off' >1A<sub>16</sub>" +
 				   "	    </label>" +
 				   "	    <label id='label2-unsigned_10_nofill'" +
 				   "		   class='btn btn-sm btn-light w-50 btn-outline-secondary' style='padding:2 2 2 2;'" +
 				   "		   aria-label='register file display format: decimal'" +
-				   "		   onclick=\"update_cfg('RF_display_format','unsigned_10_nofill'); show_rf_values(); show_states(); show_memories_values();\">" +
+				   "		   onclick=\"update_cfg('RF_display_format','unsigned_10_nofill');  show_memories_values();\">" +
 				   "		<input type='radio' name='options' id='radio2-unsigned_10_nofill'  autocomplete='off' >32<sub>10</sub>" +
 				   "	    </label>" +
 				   "	    <label id='label2-unsigned_8_nofill'" +
 				   "		   class='btn btn-sm btn-light w-50 btn-outline-secondary' style='padding:2 2 2 2;'" +
 				   "		   aria-label='register file display format: octal'" +
-				   "		   onclick=\"update_cfg('RF_display_format','unsigned_8_nofill');  show_rf_values(); show_states(); show_memories_values();\">" +
+				   "		   onclick=\"update_cfg('RF_display_format','unsigned_8_nofill');   show_memories_values();\">" +
 				   "		<input type='radio' name='options' id='radio2-unsigned_8_nofill'   autocomplete='off' >26<sub>8</sub>" +
 				   "	    </label>" +
                                    "    </div>" +
@@ -305,19 +307,19 @@
 				   "	    <label id='label2-unsigned_16_fill'" +
 				   "		   class='btn btn-sm btn-light w-50 btn-outline-secondary' style='padding:2 2 2 2;'" +
 				   "		   aria-label='register file display format: hexadecimal'" +
-				   "		   onclick=\"update_cfg('RF_display_format','unsigned_16_fill'); show_rf_values(); show_states(); show_memories_values();\">" +
+				   "		   onclick=\"update_cfg('RF_display_format','unsigned_16_fill'); show_memories_values();\">" +
 				   "		<input type='radio' name='options' id='radio2-unsigned_16_fill'  autocomplete='off' >001A<sub>16</sub>" +
 				   "	    </label>" +
 				   "	    <label id='label2-unsigned_10_fill'" +
 				   "		   class='btn btn-sm btn-light w-50 btn-outline-secondary' style='padding:2 2 2 2;'" +
 				   "		   aria-label='register file display format: decimal'" +
-				   "		   onclick=\"update_cfg('RF_display_format','unsigned_10_fill'); show_rf_values(); show_states(); show_memories_values();\">" +
+				   "		   onclick=\"update_cfg('RF_display_format','unsigned_10_fill'); show_memories_values();\">" +
 				   "		<input type='radio' name='options' id='radio2-unsigned_10_fill'  autocomplete='off' >0032<sub>10</sub>" +
 				   "	    </label>" +
 				   "	    <label id='label2-unsigned_8_fill'" +
 				   "		   class='btn btn-sm btn-light w-50 btn-outline-secondary' style='padding:2 2 2 2;'" +
 				   "		   aria-label='register file display format: octal'" +
-				   "		   onclick=\"update_cfg('RF_display_format','unsigned_8_fill');  show_rf_values(); show_states(); show_memories_values();\">" +
+				   "		   onclick=\"update_cfg('RF_display_format','unsigned_8_fill'); show_memories_values();\">" +
 				   "		<input type='radio' name='options' id='radio2-unsigned_8_fill'   autocomplete='off' >0026<sub>8</sub>" +
 				   "	    </label>" +
                                    "    </div>" +
@@ -330,7 +332,7 @@
                                    "   data-content='<img alt=\"register file example\" src=\"images/cfg-rf.gif\" class=\"img-fluid\">'><span <span data-langkey='(example)'>(example)</span></a>"
                    });
 
-    ws_config.push({
+    ws_info.config_ui.push({
                       id:          "radio3",
                       type:        "Register file",
                       u_class:     "user_archived",
@@ -347,14 +349,14 @@
 				   "		   onclick=\"update_cfg('RF_display_name','logical'); wepsim_show_rf_names();\">" +
 				   "		<input type='radio' name='options' id='radio3-logical' autocomplete='off' ><span data-langkey='Labels'>Labels</span>" +
 				   "	    </label>" +
-				   "	</div>",
+				   " </div>",
 		      code_init:   function() {
 			               $('#label3-' +   get_cfg('RF_display_name')).button('toggle');
 		                   },
                       description: "<span data-langkey='Register file names'>Register file names</span>"
                    });
 
-    ws_config.push({
+    ws_info.config_ui.push({
                       id:          "radio9",
                       type:        "Register file",
                       u_class:     "user_archived",
@@ -378,7 +380,7 @@
                       description: "<span data-langkey='Editable registers: edit register file values'>Editable registers: edit register file values</span>"
                    });
 
-    ws_config.push({
+    ws_info.config_ui.push({
                       id:          "colorpicker1",
                       type:        "Circuitry simulation",
                       u_class:     "user_microcode",
@@ -396,7 +398,7 @@
                       description: "<span data-langkey='Data-path color'>Data-path color</span> <a href='#' data-toggle='popover1' title='Example of data-path color' data-html='true' data-content='<img alt=\"register file example\" src=\"images/cfg-colors.gif\" class=\"img-fluid\">'><span <span data-langkey='(example)'>(example)</span></a>"
                    });
 
-    ws_config.push({
+    ws_info.config_ui.push({
                       id:          "colorpicker2",
                       type:        "Circuitry simulation",
                       u_class:     "user_microcode",
@@ -414,7 +416,7 @@
                       description: "<span data-langkey='Signal color'>Signal color</span>"
                    });
 
-    ws_config.push({
+    ws_info.config_ui.push({
                       id:          "radio10",
                       type:        "Circuitry simulation",
                       u_class:     "user_archived user_microcode",
@@ -438,7 +440,7 @@
                       description: "<span data-langkey='Show by value or by activation'>Show by value or by activation</span>"
                    });
 
-    ws_config.push({
+    ws_info.config_ui.push({
                       id:          "radio5",
                       type:        "Circuitry simulation",
                       u_class:     "user_microcode",
@@ -462,7 +464,7 @@
                       description: "<span data-langkey='Interactive mode: signal value can be updated'>Interactive mode: signal value can be updated</span>"
                    });
 
-    ws_config.push({
+    ws_info.config_ui.push({
                       id:          "radio6",
                       type:        "Circuitry simulation",
                       u_class:     "user_microcode",
@@ -486,7 +488,7 @@
                       description: "<span data-langkey='Quick interactive mode: quick update of signal value'>Quick interactive mode: quick update of signal value</span>"
                    });
 
-    ws_config.push({
+    ws_info.config_ui.push({
                       id:          "radio11",
                       type:        "Accesibility",
                       u_class:     "user_archived",
@@ -510,7 +512,7 @@
                       description: "<span data-langkey='Active voice: external voice control'>Active voice: external voice control</span>"
                    });
 
-    ws_config.push({
+    ws_info.config_ui.push({
                       id:          "radio13",
                       type:        "Accesibility",
                       u_class:     "user_archived",
@@ -534,7 +536,7 @@
                       description: "<span data-langkey='Verbalization: textual or mathematical'>Verbalization: textual or mathematical</span>"
                    });
 
-    ws_config.push({
+    ws_info.config_ui.push({
                       id:          "select8",
                       type:        "Accesibility",
                       u_class:     "",
@@ -558,7 +560,7 @@
                       description: "<span data-langkey='WepSIM User Interface skin'>WepSIM User Interface skin</span>"
                    });
 
-    ws_config.push({
+    ws_info.config_ui.push({
                       id:          "radio14",
                       type:        "Accesibility",
                       u_class:     "",
@@ -568,8 +570,7 @@
                                    "               aria-label='User Interface set of features for WepSIM: false' " +
 				   "		   onclick=\"var optValue = 'only_asm:of:only_frequent:on';" +
 				   "		             update_cfg('ws_skin_user', optValue);" +
-                                   "                         wepsim_restore_view(optValue);" +
-				   "		             return false;\">" +
+                                   "                         wepsim_restore_view(optValue);\">" +
 				   "		<input type='radio' name='options' id='radio14-false' aria-label='Is expert: false' autocomplete='off' >On" +
 				   "	    </label>" +
 				   "	    <label id='label14-only_asm__of__only_frequent__of'" +
@@ -577,8 +578,7 @@
                                    "               aria-label='User Interface set of features for WepSIM: true' " +
 				   "		   onclick=\"var optValue = 'only_asm:of:only_frequent:of';" +
 				   "		             update_cfg('ws_skin_user', optValue);" +
-                                   "                         wepsim_restore_view(optValue);" +
-				   "		             return false;\">" +
+                                   "                         wepsim_restore_view(optValue);\">" +
 				   "		<input type='radio' name='options' id='radio14-true'  aria-label='Is expert: true'  autocomplete='off' >Off" +
 				   "	    </label>" +
 				   "	</div>",
@@ -587,5 +587,32 @@
 			               $('#label14-' + optValue.replace(/:/g,"__")).button('toggle') ;
 		                   },
                       description: "<span data-langkey='Beginner view'>Beginner view</span>"
+                   });
+
+    ws_info.config_ui.push({
+                      id:          "radio16",
+                      type:        "Accesibility",
+                      u_class:     "",
+                      code_cfg:    "<div class='btn-group btn-group-toggle d-flex' data-toggle='buttons' >" +
+				   "	    <label id='label16-true'" +
+				   "		   class='btn btn-sm btn-light w-50 btn-outline-secondary p-1' " +
+                                   "               aria-label='AutoScrolling: true' " +
+				   "		   onclick=\"var optValue = true;" +
+				   "		             update_cfg('AS_enable', optValue);\">" +
+				   "		<input type='radio' name='options' id='radio16-true' aria-label='AutoScroll: true' autocomplete='off' >On" +
+				   "	    </label>" +
+				   "	    <label id='label16-false'" +
+				   "		   class='btn btn-sm btn-light w-50 btn-outline-secondary p-1' " +
+                                   "               aria-label='AutoScrolling: false' " +
+				   "		   onclick=\"var optValue = false;" +
+				   "		             update_cfg('AS_enable', optValue);\">" +
+				   "		<input type='radio' name='options' id='radio16-false'  aria-label='AutoScroll: false'  autocomplete='off' >Off" +
+				   "	    </label>" +
+				   "	</div>",
+		      code_init:   function() {
+			               var optValue = get_cfg('AS_enable') ;
+			               $('#label16-' + optValue).button('toggle') ;
+		                   },
+                      description: "<span data-langkey='Auto-scroll while executing'>Auto-scroll while executing</span>"
                    });
 

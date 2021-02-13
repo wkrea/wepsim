@@ -1,5 +1,5 @@
 /*
- *  Copyright 2015-2020 Felix Garcia Carballeira, Alejandro Calderon Mateos, Javier Prieto Cepeda, Saul Alonso Monsalve
+ *  Copyright 2015-2021 Felix Garcia Carballeira, Alejandro Calderon Mateos, Javier Prieto Cepeda, Saul Alonso Monsalve
  *
  *  This file is part of WepSIM.
  *
@@ -27,7 +27,7 @@
 		'History':				'História',
 		'None':					'Nenhum',
 		'Empty history':			'História vazia',
-		'Empty (only modified values are shown)':		'Vazio (apenas valores modificados são mostrados)',
+		'Empty (only modified values are shown)':	'Vazio (apenas valores modificados são mostrados)',
 		'Differences':				'Diferenças',
 		'differences with clipboard state':	'diferenças com o estado da área de transferência',
 		'Meets the specified requirements':	'Atende aos requisitos especificados',
@@ -35,7 +35,7 @@
 		'Add':					'Adicionar',
 		'\'Current State\' to History':		'\'Estado atual\' para a história',
 		'Check':				'Verifica',
-		'Copy':					'cópia de',
+		'Copy':					'Cópia de',
 		'to clipboard':				'para a área de transferência',
 		'Checkpoint':				'Ponto de verificação',
 		'File name':				'Nome do arquivo',

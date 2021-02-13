@@ -1,5 +1,5 @@
 /*
- *  Copyright 2015-2020 Felix Garcia Carballeira, Alejandro Calderon Mateos, Javier Prieto Cepeda, Saul Alonso Monsalve
+ *  Copyright 2015-2021 Felix Garcia Carballeira, Alejandro Calderon Mateos, Javier Prieto Cepeda, Saul Alonso Monsalve
  *
  *  This file is part of WepSIM.
  *
@@ -21,34 +21,35 @@
 
     i18n.eltos.examples.it = {
 
-		'addv + seqv.':		'addv + seqv.',
-		'Alloc.s':		'Alloc.s',
+		'addv + seqv.':			'addv + seqv.',
+		'Alloc.s':			'Alloc.s',
 		'Dummy instruction':		'Istruzione fittizia',
-		'Exception':		'Eccezione',
-		'Instructions':		'Istruzioni',
-		'Interruptions':		'interruzioni',
-		'Int. + syscall + except.':		'Int. + syscall + tranne',
-		'I/O':		'H/O',
-		'Looping':		'looping',
+		'Exception':			'Eccezione',
+		'Instructions':			'Istruzioni',
+		'Interruptions':		'Interruzioni',
+		'Int. + syscall + except.':	'Int. + syscall + tranne',
+		'I/O':				'I/O',
+		'Looping':			'Looping',
 		'madd, mmul, mxch':		'Aiuto, umore, mente',
 		'Masks & shift':		'Maschere e maiuscole',
-		'Matrix':		'Matrice',
+		'Matrix':			'Matrice',
 		'Memory access':		'Accesso alla memoria',
 		'SC 1, 4-5, 8, 11-12':		'SC 1, 4-5, 8, 11-12',
-		'strlen_2 + skipasciicode_2':		'strlen_2 + skipasciicode_2',
-		'Subrutine':		'sottoprogramma',
-		'syscall 1, 4-5, 8, 11-12':		'syscall 1, 4-5, 8, 11-12',
-		'System call':		'Chiamata di sistema',
-		'Threads':		'discussioni',
-		'Vector':		'Vettore',
-	        "Compiler Explorer":				"Compiler Explorer",
+		'strlen_2 + skipasciicode_2':	'strlen_2 + skipasciicode_2',
+		'Subrutine':			'Sottoprogramma',
+		'syscall 1, 4-5, 8, 11-12':	'syscall 1, 4-5, 8, 11-12',
+		'System call':			'Chiamata di sistema',
+		'Threads':			'Filo',
+		'Vector':			'Vettore',
+	        "Compiler Explorer":		"Compiler Explorer",
 		'example_04_01':		'Esempio avanzato con interruzione, chiamata di sistema ed eccezione.',
 		'example_05_01':		'Estensione specifica dell\'applicazione: addv + seqv.',
 		'example_05_03':		'Estensione specifica dell\'applicazione: madd + mmul + mxch.',
 		'example_05_02':		'Estensione specifica dell\'applicazione: strlen_2 + skipasciicode_2.',
-		'example_03_01':		'<b> Esempio istruttivo </b> con eccezione in virgola mobile.',
-		'example_03_02':		'<b> Esempio istruttivo </b> con supporto per interruzioni: fetch, RETI e .ktext/.kdata.',
-		'example_03_03':		'<b> Esempio istruttivo </b> con supporto per le chiamate di sistema.',
+		'example_03_01':		'Esempio <b>istruttivo</b> con eccezione in virgola mobile.',
+		'example_03_02':		'Esempio <b>istruttivo</b> con supporto per interruzioni: fetch, RETI e .ktext/.kdata.',
+		'example_03_03':		'Esempio <b>istruttivo</b> con supporto per le chiamate di sistema.',
+	        'example_03_04':		'Esempio <b>istruttivo</b> con una semplice convenzione di stack.',
 		'example_04_04':		'Esempio di malloc + gratuito.',
 		'example_04_02':		'Esempio di syscall per la stampa/lettura di interi e stringhe.',
 		'example_04_03':		'Esempio di thread.',
@@ -75,9 +76,9 @@
 		'Load example':			'Carica esempio',
 		'Load Assembly only':		'Carica solo il gruppo',
 		'Load Firmware only':		'Carica solo il firmware',
-		'Copy reference to clipboard':		'Copia il riferimento negli appunti',
+		'Copy reference to clipboard':	'Copia il riferimento negli appunti',
 		'Share':			'Condividi',
-		'No examples available...':		'Non sono disponibili esempi per l\'hardware selezionato',
+		'No examples available...':	'Non sono disponibili esempi per l\'hardware selezionato',
 		'Simple example':		'Semplice esempio',
 		'_last_':			'_last_'
 

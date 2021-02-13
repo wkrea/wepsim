@@ -1,8 +1,8 @@
-/*      
- *  Copyright 2015-2020 Felix Garcia Carballeira, Alejandro Calderon Mateos, Javier Prieto Cepeda, Saul Alonso Monsalve
+/*
+ *  Copyright 2015-2021 Felix Garcia Carballeira, Alejandro Calderon Mateos, Javier Prieto Cepeda, Saul Alonso Monsalve
  *
  *  This file is part of WepSIM.
- * 
+ *
  *  WepSIM is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Lesser General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -26,25 +26,39 @@
         var sim = {
 		    systems: [],
 		    active:  null,
-		    index:   0
+		    index:   0,
 	          } ;
+
 
         function simhw_add ( newElto )
         {
-            // 1.- to add a new element
-            sim.systems.push(newElto) ;
-            sim.active = newElto ;
-            sim.index  = sim.systems.length - 1 ;
+            // 1.- add a new element
+            var found = -1 ;
+            for (var m=0; m<sim.systems.length; m++)
+            {
+                 if (sim.systems[m].sim_short_name == newElto.sim_short_name) {
+                     sim.systems[m] = newElto ;
+                     sim.index = m ;
+                     found = m ;
+                 }
+            }
 
-            // 2.- to check if default behaviors are ok
+            if (-1 == found) {
+                sim.systems.push(newElto) ;
+                sim.index = sim.systems.length - 1 ;
+            }
+
+            // 2.- add a new element
+            sim.active = newElto ;
+            sim[newElto.sim_short_name] = newElto ;
+
+            // 3.- check if default behaviors are ok
             check_behavior();
-            
-            // 3.- to pre-compile behaviors & references
+
+            // 4.- pre-compile
             compile_behaviors() ;
             firedep_to_fireorder(jit_fire_dep) ;
             compute_references() ;
-
-            // 4.- to pre-compile verbals
             compile_verbals() ;
         }
 
@@ -55,25 +69,23 @@
 
         function simhw_setActive ( newActive )
         {
-	    if ( (newActive >= 0) && 
+	    if ( (newActive >= 0) &&
                  (sim.systems.length >= newActive) )
 	    {
                 sim.active = sim.systems[newActive] ;
                 sim.index  = newActive ;
 	    }
 
-            // to pre-compile behaviors & references
+            // pre-compile behaviors & references
             compile_behaviors() ;
             firedep_to_fireorder(jit_fire_dep) ;
             compute_references() ;
-
-            // to pre-compile verbals
             compile_verbals() ;
         }
 
         function simhw_getIdByName ( short_name )
         {
-            for (var m=0; m<sim.systems.length; m++) 
+            for (var m=0; m<sim.systems.length; m++)
             {
                  if (sim.systems[m].sim_short_name == short_name) {
                      return m ;
@@ -85,7 +97,7 @@
 
         function simhw_getObjByName ( short_name )
         {
-            for (var m=0; m<sim.systems.length; m++) 
+            for (var m=0; m<sim.systems.length; m++)
             {
                  if (sim.systems[m].sim_short_name == short_name) {
                      return sim.systems[m] ;
@@ -160,7 +172,7 @@
             return sim.active.components[id] ;
         }
 
-        // getInternalState
+        // InternalState
 
         function simhw_internalState ( name )
         {
@@ -179,15 +191,7 @@
 
         function simhw_internalState_reset ( name, val )
         {
-            if (typeof ep_internal_states != "undefined")
-            {
-                 ep_internal_states[name] = val ;
-                 sim.active.internal_states[name] = ep_internal_states[name] ;
-            }
-            else 
-            {
-                 sim.active.internal_states[name] = val ;
-            }
+            sim.active.internal_states[name] = val ;
         }
 
         // ctrl_states
@@ -196,4 +200,59 @@
         {
             return sim.active.ctrl_states ;
         }
+
+
+    /*
+     *  Simulated Hardware: available set
+     */
+
+    var ws_hw_hash = {} ;
+    var ws_hw_set  = [] ;
+
+    function simhw_hwset_init ( )
+    {
+         var url_list = get_cfg('hw_url') ;
+
+         // try to load the index
+         ws_hw_set = wepsim_url_getJSON(url_list) ;
+
+         // build reference hash
+         for (var i=0; i<ws_hw_set.length; i++) {
+              ws_hw_hash[ws_hw_set[i].name] = ws_hw_set[i].url ;
+         }
+
+         return ws_hw_hash ;
+    }
+
+    function simhw_hwset_getSet ( )
+    {
+         return ws_hw_hash ;
+    }
+
+    function simhw_hwset_loadAll ( )
+    {
+         var jobj = {} ;
+
+         // try to load each one
+         for (var i=0; i<ws_hw_set.length; i++)
+         {
+	      jobj = $.getJSON({'url': ws_hw_set[i].url, 'async': false}) ;
+              simcore_hardware_import(jobj.responseText) ;
+         }
+
+         return true ;
+    }
+
+    function simhw_hwset_load ( p_name )
+    {
+         if (typeof ws_hw_hash[p_name] === "undefined") {
+             return false ;
+         }
+
+         // try to load the requested one
+	 var jobj = $.getJSON({'url': ws_hw_hash[p_name], 'async': false}) ;
+	 simcore_hardware_import(jobj.responseText) ;
+
+         return true ;
+    }
 

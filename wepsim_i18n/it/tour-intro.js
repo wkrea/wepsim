@@ -1,5 +1,5 @@
 /*
- *  Copyright 2015-2020 Felix Garcia Carballeira, Alejandro Calderon Mateos, Javier Prieto Cepeda, Saul Alonso Monsalve
+ *  Copyright 2015-2021 Felix Garcia Carballeira, Alejandro Calderon Mateos, Javier Prieto Cepeda, Saul Alonso Monsalve
  *
  *  This file is part of WepSIM.
  *
@@ -28,12 +28,12 @@
                                         "<ul>" +
                                         "<li>L'hardware con cui lavorare (ad es. processore EP, ecc.)</li>" +
                                         "<li>Modalità solo assembly, con MIPS<sub>32</sub> interi o RISC-V <sub>32</sub> istruzioni</li>" +
-                                        "<li>La modalità tutorial, consigliata all'inizio ;-)</li>" +
                                         "</ul>",
 		'step3':		'In alto a destra, il pulsante "Guida" apre la finestra di dialogo associata. <br> <br> La finestra di dialogo della guida riassume le esercitazioni, le descrizioni, le informazioni, ecc.',
 		'step4':		'E a sinistra, il pulsante \'esempi\' apre la finestra di dialogo di esempio. <br> <br> Ci sono molti esempi che possono essere usati per imparare in modo incrementale.',
 		'step5':		'In alto a sinistra, il pulsante \'configurazione\' apre la finestra di configurazione. <br> <br> Permette agli utenti di adattare diversi aspetti dell\'esecuzione, dell\'interfaccia utente, delle preferenze, ecc.',
 		'step6':		'Congratulazioni! Conosci gli elementi chiave nell\'interfaccia di WepSIM. <br> Dalla finestra di dialogo \'Aiuto\' puoi accedere al \'Tutorial di benvenuto\' per continuare ad apprendere. <br>',
+
 		'_last_':		'_last_'
 
     };

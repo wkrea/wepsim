@@ -1,5 +1,5 @@
 /*
- *  Copyright 2015-2020 Felix Garcia Carballeira, Alejandro Calderon Mateos, Javier Prieto Cepeda, Saul Alonso Monsalve
+ *  Copyright 2015-2021 Felix Garcia Carballeira, Alejandro Calderon Mateos, Javier Prieto Cepeda, Saul Alonso Monsalve
  *
  *  This file is part of WepSIM.
  *
@@ -41,7 +41,7 @@
 
 	    // if delay was passed, set up a timeout to close the alert
 	    if (ntf_delay != 0) {
-		window.setTimeout(function() { alert1.alert("close"); }, ntf_delay);    
+		window.setTimeout(function() { alert1.alert("close"); }, ntf_delay) ;
 	    }
 
 	    // audio
@@ -83,66 +83,4 @@
             simcore_record_append_new('Close all notifications',
                                       'wepsim_notify_close();\n') ;
     }
-
-
-    /*
-     * Notifications (summary)
-     */
-
-    function wepsim_notifications_open ( )
-    {
-        var notifications = simcore_notifications_get() ;
-
-	$('#container-notifications2').html(table_notifications_html(notifications)) ;
-	$("#container-notifications2").scrollTop(0) ;
-
-	i18n_update_tags('cfg') ;
-	$('#notifications2').modal('show') ;
-
-	// stats about ui
-        ga('send', 'event', 'ui', 'ui.dialog', 'ui.dialog.notifications') ;
-    }
-
-    function table_notifications_html ( notifications )
-    {
-	// setup content...
-	var u = '' ;
-        var t = null ;
-	var m = '' ;
-	for (var i=notifications.length-1; i!=-1; i--)
-	{
-		 t = new Date(notifications[i].date) ;
-		 m = notifications[i].message.replace(/\n/g, '<br>\n') ;
-
-                 u += '<li class="list-group-item list-group-item-' + notifications[i].type + ' rounded-lg mx-2 my-1 p-2">' +
-			'<h5 class="m-0 collapse7 show">' +
-			'<span class="badge">(' +
-                            t.getHours()    + ':' + t.getMinutes()   + ':' + t.getSeconds() + '.' + t.getMilliseconds() +
-			')</span>' +
-			'<span class="badge">[' + t.getFullYear() + '-' + (t.getMonth()+1) + '-' + t.getDate() + ']</span>' +
-			'</h5>' +
-			'<span class="text-monospace">' + notifications[i].title + ':' + '</span>' + m +
-			'</li>' ;
-	}
-	if (u.trim() === '') {
-	    u = '<p class="m-3 text-center"><b>&lt;Empty&gt;</b></p>' ;
-	}
-
-	// build html
-	var o = '<div id="notifications2" class="alert alert-light p-0 m-0" role="alert">+ <span data-langkey="Recent">Recent</span></div>' +
-	        '<div id="container-notifications2" class="card" style="max-height:65vh; overflow:auto; -webkit-overflow-scrolling: touch;">' +
-	        '<ul class="list-group list-group-flush">' + 
-                u +
-	        '</ul>' +
-	        '</div>' +
-                '<div class="alert alert-light p-0 m-0" role="alert">- <span data-langkey="Recent">Recent</span></div>' ;
-
-	return o ;
-    }
-
-    function wepsim_notifications_close ( )
-    {
-        $('#notifications2').modal('hide') ;
-    }
-
 

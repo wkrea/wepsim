@@ -1,5 +1,5 @@
 /*
- *  Copyright 2015-2020 Felix Garcia Carballeira, Alejandro Calderon Mateos, Javier Prieto Cepeda, Saul Alonso Monsalve
+ *  Copyright 2015-2021 Felix Garcia Carballeira, Alejandro Calderon Mateos, Javier Prieto Cepeda, Saul Alonso Monsalve
  *
  *  This file is part of WepSIM.
  *
@@ -58,6 +58,8 @@
 		'Quick interactive mode: quick update of signal value':		'Modalità interattiva rapida: aggiornamento rapido del valore del segnale',
 		'(example)':							'(esempio)',
 		'Accesibility':							'Accessibilità',
+                'Beginner view': 						'Visualizzazione per principianti',
+                'Auto-scroll while executing': 				        'Scorrimento automatico durante l\'esecuzione',
 		'Active voice: external voice control':				'Voce attiva: controllo vocale esterno',
 		'Verbalization: textual or mathematical':			'Verbalizzazione: testuale o matematica',
 		'WepSIM User Interface views':					'Viste dell\'interfaccia utente di WepSIM',

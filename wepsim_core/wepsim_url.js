@@ -1,5 +1,5 @@
 /*
- *  Copyright 2015-2020 Felix Garcia Carballeira, Alejandro Calderon Mateos, Javier Prieto Cepeda, Saul Alonso Monsalve
+ *  Copyright 2015-2021 Felix Garcia Carballeira, Alejandro Calderon Mateos, Javier Prieto Cepeda, Saul Alonso Monsalve
  *
  *  This file is part of WepSIM.
  *
@@ -175,7 +175,7 @@
 				   {
 				      if (typeof response == "undefined") {
 					  wepsim_notify_error("<strong>ERROR</strong>",
-					                      "File " + url + " could not be fetched:" +
+					                      "File " + url + " could not be fetched:<br>\n" +
                                                               " * Please check that you are on-line.") ;
 					  return ;
 				      }
@@ -203,5 +203,53 @@
 		xmlhttp.open("GET", url, true);
 		xmlhttp.send();
 	}
+    }
+
+    function wepsim_url_getJSON ( url_json )
+    {
+       var jstr = {} ;
+       var jobj = [] ;
+
+       try {
+           jstr = $.getJSON({'url': url_json, 'async': false}) ;
+           jobj = JSON.parse(jstr.responseText) ;
+       }
+       catch (e) {
+           ws_alert("Unable to load '" + url_json + "': " + e + ".\n") ;
+           jobj = [] ;
+       }
+
+       return jobj ;
+    }
+
+    function wepsim_url_json ( json_url, do_after )
+    {
+	    // preload json_url only if file_size(json_url) < max_json_size bytes
+	    var xhr = new XMLHttpRequest() ;
+	    xhr.open("HEAD", json_url, true) ;
+
+	    xhr.onreadystatechange = function() {
+		if (this.readyState == this.DONE)
+	        {
+	            var size = 0 ;
+
+		    var content_length = xhr.getResponseHeader("Content-Length") ;
+		    if (content_length !== null) {
+		        size = parseInt(content_length) ;
+		    }
+
+                    var max_json_size = get_cfg('max_json_size') ;
+		    if (size < max_json_size) {
+	                $.getJSON(json_url, do_after).fail(function(e) {
+				                              wepsim_notify_do_notify('getJSON', 
+									              'There was some problem for getting ' + json_url, 
+									              'warning', 
+									              0);
+			                                   }) ;
+		    }
+		}
+	    } ;
+
+	    xhr.send();
     }
 

@@ -1,5 +1,5 @@
 /*
- *  Copyright 2015-2020 Felix Garcia Carballeira, Alejandro Calderon Mateos, Javier Prieto Cepeda, Saul Alonso Monsalve
+ *  Copyright 2015-2021 Felix Garcia Carballeira, Alejandro Calderon Mateos, Javier Prieto Cepeda, Saul Alonso Monsalve
  *
  *  This file is part of WepSIM.
  *
@@ -23,30 +23,30 @@
      * Copy to clipboard
      */
 
-    var clipboard_copy = '' ;
+    ws_info.clipboard_copy = '' ;
 
-    function get_clipboard_copy ( ) 
+    function get_clipboard_copy ( )
     {
-        return clipboard_copy ;
+        return ws_info.clipboard_copy ;
     }
 
-    // credit for the SelectText function: 
+    // credit for the SelectText function:
     // https://stackoverflow.com/questions/985272/selecting-text-in-an-element-akin-to-highlighting-with-your-mouse
-    function SelectText (element) 
+    function SelectText (element)
     {
         var doc = document
             , text = doc.getElementById(element)
             , range, selection
-        ;    
-        if (doc.body.createTextRange) 
+        ;   
+        if (doc.body.createTextRange)
 	{
             range = document.body.createTextRange();
             range.moveToElementText(text);
             range.select();
-        } 
-	else if (window.getSelection) 
+        }
+	else if (window.getSelection)
 	{
-            selection = window.getSelection();        
+            selection = window.getSelection();       
             range = document.createRange();
             range.selectNodeContents(text);
             selection.removeAllRanges();
@@ -62,18 +62,18 @@
 	    {
                  SelectText(element_name) ;
 
-                 if (document.execCommand('copy')) 
+                 if (document.execCommand('copy'))
 		 {
-		     clipboard_copy = $('#' + element_name).text() ;
+		     ws_info.clipboard_copy = $('#' + element_name).text() ;
 		     msg = 'successful' ;
 		 }
-	    } 
+	    }
 	    catch (e)
 	    {
 		 msg += msg + ' because ' + e ;
-	    } 
+	    }
 
-	    wepsim_notify_success('<strong>INFO</strong>', 
+	    wepsim_notify_success('<strong>INFO</strong>',
                                   'Copied ' + msg + '!.') ;
     }
 
@@ -85,13 +85,13 @@
 		 var copyTextarea = document.getElementById(element_name);
 		 copyTextarea.select();
                  document.execCommand('copy') ;
-		 clipboard_copy = $('#' + element_name).val() ;
-	    } 
+		 ws_info.clipboard_copy = $('#' + element_name).val() ;
+	    }
             catch (err) {
 		 msg = 'unsuccessful' ;
 	    }
 
-	    wepsim_notify_success('<strong>INFO</strong>', 
+	    wepsim_notify_success('<strong>INFO</strong>',
                                   'Copied ' + msg + '!.') ;
     }
 

@@ -1,5 +1,5 @@
 /*
- *  Copyright 2015-2020 Felix Garcia Carballeira, Alejandro Calderon Mateos, Javier Prieto Cepeda, Saul Alonso Monsalve
+ *  Copyright 2015-2021 Felix Garcia Carballeira, Alejandro Calderon Mateos, Javier Prieto Cepeda, Saul Alonso Monsalve
  *
  *  This file is part of WepSIM.
  *
@@ -23,12 +23,22 @@
      * Share
      */
 
-    function share_infomation ( info_shared, share_title, share_text, share_url )
+    function share_information ( info_shared, share_title, share_text, share_url )
     {
 	 if (typeof navigator.share === 'undefined')
 	 {
-	     alert('Sorry, unable to share:\n' + 
-		   'navigator.share is not available.') ;
+	     var msg = 'Sorry, unable to share:<br>\n' +
+		       'navigator.share is not available.<br>' +
+		       '<br>' +
+		       '<div id="qrcode1" class="mx-auto"></div>' +
+		       '<br>' ;
+	     wsweb_dlg_alert(msg) ;
+
+             if (share_url !== "") {
+                 var qrcode = new QRCode("qrcode1") ;
+                     qrcode.makeCode(share_url) ;
+             }
+
 	     return false ;
 	 }
 
@@ -40,13 +50,13 @@
 	 data.url   = share_url ;
 
 	 // try to share data
-	 try 
+	 try
 	 {
 	     navigator.share(data) ;
-	 } 
-	 catch(err) 
+	 }
+	 catch(err)
 	 {
-	     alert('Sorry, unsuccessful share: ' + err.message) ;
+	     wsweb_dlg_alert('Sorry, unsuccessful share: ' + err.message) ;
 	 }
 
 	 // stats about sharing

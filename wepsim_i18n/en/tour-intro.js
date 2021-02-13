@@ -1,5 +1,5 @@
 /*
- *  Copyright 2015-2020 Felix Garcia Carballeira, Alejandro Calderon Mateos, Javier Prieto Cepeda, Saul Alonso Monsalve
+ *  Copyright 2015-2021 Felix Garcia Carballeira, Alejandro Calderon Mateos, Javier Prieto Cepeda, Saul Alonso Monsalve
  *
  *  This file is part of WepSIM.
  *
@@ -33,7 +33,6 @@
                                   "<ul>" +
                                   "<li>The hardware to work with (e.g. EP processor, etc.)</li>" +
                                   "<li>Assembly only mode, with integer MIPS<sub>32</sub> or RISC-V<sub>32</sub> instructions</li>" +
-                                  "<li>The tutorial mode, recommended at the beginning ;-)</li>" +
                                   "</ul>",
 
                         "step3":  "On the top-right, the 'help' button opens the associated dialog.<br>" +
@@ -46,9 +45,9 @@
 
                         "step5":  "On the top-left, the 'configuration' button opens the configuration dialog.<br>" +
                                   "<br>" +
-                                  "It let users to adapt several aspects of the execution, user interface, preferences, etc.",
+                                  "It allows users to adapt several aspects of the execution, user interface, preferences, etc.",
 
-                        "step6":  "Congrat! You know the key elements in the WepSIM interface.<br>" +
+                        "step6":  "Congrats! You know the key elements in the WepSIM interface.<br>" +
                                   "From the 'Help' dialog you can access the 'Welcome tutorial' to continue learning.<br>"
 
     } ;

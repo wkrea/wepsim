@@ -1,5 +1,5 @@
 /*
- *  Copyright 2015-2020 Felix Garcia Carballeira, Alejandro Calderon Mateos, Javier Prieto Cepeda, Saul Alonso Monsalve
+ *  Copyright 2015-2021 Felix Garcia Carballeira, Alejandro Calderon Mateos, Javier Prieto Cepeda, Saul Alonso Monsalve
  *
  *  This file is part of WepSIM.
  *
@@ -26,13 +26,13 @@
     function wepsim_checkpoint_get ( tagName )
     {
 	    // get mode and history
-	    var ws_mode           = get_cfg('ws_mode') ;
-            var history_obj       = wepsim_state_history_get() ;
+	    var ws_mode     = get_cfg('ws_mode') ;
+            var history_obj = wepsim_state_history_get() ;
 
 	    // get current state
 	    var state_current     = wepsim_state_get_clk() ;
 	    var state_obj         = simcore_simstate_current2state() ;
-	    state_current.content = simcore_simstate_state2checklist(state_obj) ;
+	    state_current.content = simcore_simstate_state2checklist(state_obj, '') ;
 
 	    // pack elements
 	    var elements = {
@@ -50,7 +50,7 @@
 	    return elements ;
     }
 
-    function wepsim_checkpoint_loadFromObj ( checkpointObj, obj_fileName, obj_tagName, obj_fileToLoad )
+    function wepsim_checkpoint_loadFromObj ( checkpointObj, obj_fileToLoad )
     {
 	   var o = '' ;
 	   var u = '' ;
@@ -76,7 +76,7 @@
 		// all saved states are loaded into state history
 	        wepsim_state_history_reset() ;
 	        for (var i=0; i<checkpointObj.state_history.length; i++) {
-	             state_history.push(checkpointObj.state_history[i]) ;
+	             ws_info.state_history.push(checkpointObj.state_history[i]) ;
 	        }
 	        wepsim_state_history_list() ;
 
@@ -109,24 +109,12 @@
 		}
 		o += '.</li>' ;
 
-	   // 4.- restore user interface elements
-
-		// load tag
-	        if ((typeof obj_fileName !== "undefined") && (obj_fileName !== null)) {
-		     obj_fileName.value = obj_fileToLoad.name ;
-		}
-	        if ((typeof obj_fileName !== "undefined") && (obj_tagName !== null)) {
-		     obj_tagName.value  = checkpointObj.tag ;
-		}
-
-		o += '<li>Tag: <strong>' + checkpointObj.tag + '</strong></li>' ;
-
-	   // 5.- restore record
+	   // 4.- restore record
 
 		// set the saved record
                 simcore_record_set(checkpointObj.record) ;
 
-	   // 6.- notify
+	   // 5.- notify
 	   if (o !== '') {
 	       o = 'WepSIM has been instructed to restore a checkpoint:<br>' +
 		   '<ul>' +
@@ -202,7 +190,7 @@
 			        "mimetype": "application/javascript",
 			        "file_extension": ".js"
 			    },
-			    "title": "WepSIM " + get_cfg("version"),
+			    "title": "WepSIM ", // + get_cfg("version"),
 			    "nteract": {
 			        "version": "nteract-on-jupyter@2.0.0"
 			    }
@@ -268,10 +256,9 @@
 	    return true ;
     }
 
-	    function wepsim_checkpoint_afterLoad ( textLoaded, 
-		                                   obj_fileName, obj_tagName, obj_fileToLoad )
+	    function wepsim_checkpoint_afterLoad ( textLoaded, obj_fileToLoad )
 	    {
-		    try 
+		    try
 		    {
 			   var current_checkpoint = null ;
 
@@ -280,31 +267,27 @@
 			       current_checkpoint = wepsim_checkpoint_NB2Obj(current_checkpoint) ;
                            }
 
-			   wepsim_checkpoint_loadFromObj(current_checkpoint,
-							 obj_fileName, obj_tagName, obj_fileToLoad) ;
+			   wepsim_checkpoint_loadFromObj(current_checkpoint, obj_fileToLoad) ;
 		    }
-		    catch (e) 
+		    catch (e)
 		    {
 			   ws_alert('Error on checkpoint file: ' + e) ;
 		    }
 	    }
 
-    function wepsim_checkpoint_load ( id_filename, id_tagname, id_file_to_load )
+    function wepsim_checkpoint_load ( id_file_to_load )
     {
 	    // get & check params
-            var obj_fileName   = document.getElementById(id_filename) ;
-	    var obj_tagName    = document.getElementById(id_tagname) ;
 	    var obj_fileToLoad = document.getElementById(id_file_to_load).files[0] ;
 
-	    if ( (obj_fileName === null) || (obj_tagName === null) || (obj_fileToLoad === null) || (typeof obj_fileToLoad === 'undefined'))
+	    if ( (obj_fileToLoad === null) || (typeof obj_fileToLoad === 'undefined'))
 	    {
 		return false ;
 	    }
 
 	    // lambda (auxiliar) function
-	    var function_after_loaded = function (textLoaded)
-	                                {
-					   wepsim_checkpoint_afterLoad(textLoaded, obj_fileName, obj_tagName, obj_fileToLoad) ;
+	    var function_after_loaded = function (textLoaded) {
+					   wepsim_checkpoint_afterLoad(textLoaded, obj_fileToLoad);
 			                } ;
 
 	    // load checkpoint
@@ -312,15 +295,11 @@
 	    return true ;
     }
 
-    function wepsim_checkpoint_loadURI ( obj_uri, id_filename, id_tagname )
+    function wepsim_checkpoint_loadURI ( obj_uri )
     {
-	    // get & check params
-	    var obj_fileName = document.getElementById(id_filename) ;
-	    var obj_tagName  = document.getElementById(id_tagname) ;
-
-	    if ( (obj_fileName === null) || (obj_tagName === null) || (obj_uri === null) )
-	    {
-		return false ;
+	    // check params
+	    if ( (typeof obj_uri === "undefined") || (obj_uri === null) ) {
+		  return false ;
 	    }
 
 	    // load checkpoint
@@ -328,13 +307,12 @@
 	    {
                 var filename = obj_uri.href.substring(obj_uri.href.lastIndexOf('/') + 1) ;
 
-	        wepsim_preload_json(obj_uri.href,
-			            function(data) {
-	                                var obj_refName        = { name: filename } ;
-                                        var current_checkpoint = wepsim_checkpoint_NB2Obj(data) ;
-				        wepsim_checkpoint_loadFromObj(current_checkpoint,
-					                              obj_fileName, obj_tagName, obj_refName) ;
-			            }) ;
+	        wepsim_url_json(obj_uri.href,
+			        function(data) {
+	                            var obj_refName        = { name: filename } ;
+                                    var current_checkpoint = wepsim_checkpoint_NB2Obj(data) ;
+				    wepsim_checkpoint_loadFromObj(current_checkpoint, obj_refName) ;
+			        }) ;
 	        return true ;
 	    }
 	    catch (e) {
@@ -351,10 +329,7 @@
 	                                {
 					   var obj_refName = { name: file_uri } ;
 
-					   wepsim_checkpoint_afterLoad(data_text, 
-								       'FileNameToSaveAs1', 
-								       'tagToSave1', 
-								       obj_refName) ;
+					   wepsim_checkpoint_afterLoad(data_text, obj_refName) ;
 			                } ;
 
 	    // load checkpoint from url
@@ -385,10 +360,10 @@
 	         share_title += ' (' + obj_tagName.value + ')...' ;
 	    else share_title += '...' ;
 
-            return share_infomation('checkpoint',
-                                    share_title,
-                                    share_text,
-                                    share_url) ;
+            return share_information('checkpoint',
+                                     share_title,
+                                     share_text,
+                                     share_url) ;
     }
 
 
@@ -454,7 +429,7 @@
 	    return true ;
     }
 
-    function wepsim_checkpoint_loadFromCache ( id_filename, id_tagname, id_backupname )
+    function wepsim_checkpoint_loadFromCache ( id_backupname )
     {
 	    var ret = {
 		         error: true,
@@ -462,14 +437,6 @@
 	              } ;
 
 	    // get & check params
-            var obj_fileName = document.getElementById(id_filename) ;
-	    var obj_tagName  = document.getElementById(id_tagname) ;
-	    if ( (obj_fileName === null) || (obj_tagName === null) )
-	    {
-		ret.msg = "Invalid arguments" ;
-		return ret ;
-	    }
-
 	    var browserCacheElto = $('input[name=' + id_backupname + ']:checked');
 	    if (typeof browserCacheElto[0] === 'undefined')
 	    {
@@ -488,9 +455,8 @@
 		return ret ;
 	    }
 
-	    var obj_fileToLoad = { name: '' } ; 
-	    wepsim_checkpoint_loadFromObj(current_checkpoint,
-					  obj_fileName, obj_tagName, obj_fileToLoad) ;
+	    var obj_fileToLoad = { name: '' } ;
+	    wepsim_checkpoint_loadFromObj(current_checkpoint, obj_fileToLoad) ;
 
 	    ret.error = false ;
 	    ret.msg   = "Processing load request..." ;

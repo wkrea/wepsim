@@ -1,5 +1,5 @@
 /*
- *  Copyright 2015-2020 Felix Garcia Carballeira, Alejandro Calderon Mateos, Javier Prieto Cepeda, Saul Alonso Monsalve
+ *  Copyright 2015-2021 Felix Garcia Carballeira, Alejandro Calderon Mateos, Javier Prieto Cepeda, Saul Alonso Monsalve
  *
  *  This file is part of WepSIM.
  *
@@ -59,6 +59,8 @@
 		'WepSIM User Interface skin':					'WepSIM User Interface-hud',
 		'(example)':							'(exempel)',
 		'Accesibility':							'Tillgänglighet',
+                'Beginner view': 						'Nybörjarvy',
+                'Auto-scroll while executing': 				        'Bläddra automatiskt under körning',
 		'Active voice: external voice control':				'Aktiv röst: extern röststyrning',
 		'Verbalization: textual or mathematical':			'Verbalisering: text- eller matematisk',
 		'WepSIM User Interface views':					'WepSIM User Interface visningar',

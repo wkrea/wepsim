@@ -1,5 +1,5 @@
 /*
- *  Copyright 2015-2020 Felix Garcia Carballeira, Alejandro Calderon Mateos, Javier Prieto Cepeda, Saul Alonso Monsalve
+ *  Copyright 2015-2021 Felix Garcia Carballeira, Alejandro Calderon Mateos, Javier Prieto Cepeda, Saul Alonso Monsalve
  *
  *  This file is part of WepSIM.
  *
@@ -110,6 +110,8 @@
 				   }, wait_time);
     }
 
+    var ws_glowing_time = 250 ;
+
     function simcore_record_glowing ( ui_id )
     {
          // check params
@@ -121,10 +123,10 @@
          // add class and...
          ui_obj.addClass('btn-warning') ;
 
-         // ...remove it after 250 ms.
+         // ...remove it after 'ws_glowing_time' ms.
          setTimeout(function() {
 		       ui_obj.removeClass('btn-warning') ;
-	            }, 250) ;
+	            }, ws_glowing_time) ;
     }
 
     function simcore_record_glowAdd ( )
@@ -334,9 +336,18 @@
     {
         if (ws_is_recording === true)
 	{
+            // distance + update internal clock
 	    var distance = Date.now() - ws_last_time ;
             ws_last_time = Date.now() ;
 
+            // min. distance -> glowing time
+	    if ( (0 == distance) && (ws_records.length > 0) && 
+                 (ws_records[ws_records.length-1].description === "_pending event_") ) 
+            {
+	         distance = ws_glowing_time ;
+	    }
+
+            // add event
             simcore_record_pushElto("_pending event_", ";", distance) ;
 	}
     }

@@ -1,5 +1,5 @@
 /*
- *  Copyright 2015-2020 Felix Garcia Carballeira, Alejandro Calderon Mateos, Javier Prieto Cepeda, Saul Alonso Monsalve
+ *  Copyright 2015-2021 Felix Garcia Carballeira, Alejandro Calderon Mateos, Javier Prieto Cepeda, Saul Alonso Monsalve
  *
  *  This file is part of WepSIM.
  *
@@ -27,7 +27,7 @@
 		'History':				'история',
 		'None':					'Никто',
 		'Empty history':			'Пустая история',
-		'Empty (only modified values are shown)':		'Пусто (отображаются только измененные значения)',
+		'Empty (only modified values are shown)':	'Пусто (отображаются только измененные значения)',
 		'Differences':				'Различия',
 		'differences with clipboard state':	'различия с состоянием буфера обмена',
 		'Meets the specified requirements':	'Соответствует указанным требованиям',
