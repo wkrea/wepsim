@@ -1,9 +1,9 @@
 #!/bin/sh
-set -x
+#set -x
 
 
 #*
-#*  Copyright 2015-2020 Felix Garcia Carballeira, Alejandro Calderon Mateos, Javier Prieto Cepeda, Saul Alonso Monsalve
+#*  Copyright 2015-2026 The WepSIM team (see docs/WEPSIM-TEAM.md)
 #*
 #*  This file is part of WepSIM.
 #*
@@ -22,220 +22,236 @@ set -x
 #*
 
 
-# skeleton
-echo "ws_dist"
-                    mkdir -p ws_dist
-                    touch    ws_dist/index.html
-                    mkdir -p ws_dist/external
-                    touch    ws_dist/external/index.html
-cp external/jquery.min.js    ws_dist/external
-                    mkdir -p ws_dist/help
-                    touch    ws_dist/help/index.html
+### Welcome
+echo ""
+echo "  WepSIM packer"
+echo " ---------------"
+echo ""
 
-#  hardware model + software model + core (simulation ctrl + UI)
-echo "ws_dist/min.sim_all.js"
-cat sim_hw/sim_hw_index.js \
-    sim_hw/sim_hw_values.js \
-    sim_hw/sim_hw_behavior.js \
-    sim_hw/sim_hw_ep/sim_ep.js \
-    sim_hw/sim_hw_ep/sim_hw_board.js \
-    sim_hw/sim_hw_ep/sim_hw_cpu.js \
-    sim_hw/sim_hw_ep/sim_hw_mem.js \
-    sim_hw/sim_hw_ep/sim_hw_io.js \
-    sim_hw/sim_hw_ep/sim_hw_kbd.js \
-    sim_hw/sim_hw_ep/sim_hw_scr.js \
-    sim_hw/sim_hw_poc/sim_poc.js \
-    sim_hw/sim_hw_poc/sim_hw_board.js \
-    sim_hw/sim_hw_poc/sim_hw_cpu.js \
-    sim_hw/sim_hw_poc/sim_hw_mem.js \
-    sim_hw/sim_hw_poc/sim_hw_io.js \
-    sim_hw/sim_hw_poc/sim_hw_kbd.js \
-    sim_hw/sim_hw_poc/sim_hw_scr.js \
-    \
-    sim_sw/sim_lang.js \
-    sim_sw/sim_lang_firm.js \
-    sim_sw/sim_lang_asm.js \
-    sim_sw/sim_lang_cis2native.js \
-    \
-    sim_core/sim_cfg.js \
-    sim_core/sim_core_record.js \
-    sim_core/sim_core_ctrl.js \
-    sim_core/sim_core_ui.js \
-    sim_core/sim_api_core.js \
-    sim_core/sim_api_native.js \
-    sim_core/sim_api_stateshots.js \
-    sim_core/sim_core_voice.js \
-    sim_core/sim_core_notify.js > ws_dist/sim_all.js
-/usr/bin/yui-compressor -o ws_dist/min.sim_all.js ws_dist/sim_all.js
-rm -fr ws_dist/sim_all.js
 
-#  WepSIM internalization (i18n)
-echo "ws_dist/help/..."
-cat wepsim_i18n/i18n.js > ws_dist/wepsim_i18n.js
-for LANG in es en fr kr ja it pt hi zh_cn ru sv de; do
-cat wepsim_i18n/$LANG/gui.js \
-    wepsim_i18n/$LANG/tutorial-welcome.js \
-    wepsim_i18n/$LANG/tutorial-simpleusage.js \
-    wepsim_i18n/$LANG/tour-intro.js \
-    wepsim_i18n/$LANG/cfg.js \
-    wepsim_i18n/$LANG/help.js \
-    wepsim_i18n/$LANG/states.js \
-    wepsim_i18n/$LANG/examples.js \
-    wepsim_i18n/$LANG/dialogs.js  >> ws_dist/wepsim_i18n.js
-cp  wepsim_i18n/$LANG/simulator.html ws_dist/help/simulator-"$LANG".html
-cp  wepsim_i18n/$LANG/about.html     ws_dist/help/about-"$LANG".html
+### Arguments
+while getopts 'vdh' opt; do
+  case "$opt" in
+    v)
+      echo "  getopts: processing verbose..."
+      echo ""
+      set -x
+      ;;
+
+    d)
+      echo "  Please install first:"
+      echo ""
+      cat "$(dirname $0)"/install_prereq.sh | sed "s/^/     /g" | grep -v "set -x" | grep -v "/bin/bash"
+      echo ""
+      exit
+      ;;
+
+    ?|h)
+      echo "  Usage: "$(basename $0)" [-v] [-d]"
+      echo ""
+      exit 1
+      ;;
+  esac
 done
-/usr/bin/yui-compressor -o ws_dist/min.wepsim_i18n.js ws_dist/wepsim_i18n.js
-rm -fr ws_dist/wepsim_i18n.js
+shift "$(($OPTIND -1))"
 
-#  WepSIM web
-echo "ws_dist/min.wepsim_web.js"
-cat wepsim_core/wepsim_url.js \
-    wepsim_core/wepsim_clipboard.js \
-    wepsim_core/wepsim_preload.js \
-    wepsim_core/wepsim_checkpoint.js \
-    wepsim_core/wepsim_signal.js \
-    wepsim_core/wepsim_state.js \
-    wepsim_core/wepsim_execute.js \
-    wepsim_core/wepsim_notify.js \
-    \
-    wepsim_core/wepsim_ui_cpu.js \
-    wepsim_core/wepsim_ui_cpu_svg.js \
-    wepsim_core/wepsim_ui_registers.js \
-    wepsim_core/wepsim_ui_console.js \
-    wepsim_core/wepsim_ui_control_memory.js \
-    wepsim_core/wepsim_ui_main_memory.js \
-    wepsim_core/wepsim_ui_io.js \
-    wepsim_core/wepsim_ui_hw.js \
-    \
-    wepsim_core/wepsim_dbg_asm.js \
-    wepsim_core/wepsim_dbg_mc.js \
-    wepsim_core/wepsim_dbg_breakpointicons.js \
-    \
-    wepsim_core/wepsim_mode.js \
-    wepsim_core/wepsim_share.js \
-    wepsim_core/wepsim_config.js \
-    wepsim_core/wepsim_config_commands.js \
-    wepsim_core/wepsim_example.js \
-    wepsim_core/wepsim_example_commands.js \
-    wepsim_core/wepsim_example_commands-ep_mips.js \
-    wepsim_core/wepsim_example_commands-ep_rv32.js \
-    wepsim_core/wepsim_example_commands-ep_z80.js \
-    wepsim_core/wepsim_example_commands-poc_mips.js \
-    wepsim_core/wepsim_help.js \
-    wepsim_core/wepsim_help_commands.js \
-    wepsim_core/wepsim_tutorial.js \
-    wepsim_core/wepsim_tutorial_welcome.js \
-    wepsim_core/wepsim_tutorial_simpleusage.js \
-    wepsim_core/wepsim_tour.js \
-    wepsim_core/wepsim_tour_commands.js \
-    wepsim_core/wepsim_voice.js \
-    wepsim_core/wepsim_voice_commands.js \
-    \
-    wepsim/wepsim_web_simulator.js \
-    wepsim/wepsim_web_editor.js \
-    wepsim/wepsim_web_api.js > ws_dist/wepsim_web.js
-/usr/bin/yui-compressor -o ws_dist/min.wepsim_web.js ws_dist/wepsim_web.js
-rm -fr ws_dist/wepsim_web.js
 
-#  WepSIM web engine
-echo "ws_dist/min.wepsim_web.js"
-cat ws_dist/min.wepsim_i18n.js \
-    ws_dist/min.wepsim_web.js > ws_dist/transient.js
-mv ws_dist/transient.js ws_dist/min.wepsim_web.js
+### Install npm dependencies
+echo "  Step for npm dependencies to install/update:"
+echo "  npm install"
+npm install
+echo "  Done."
+echo ""
 
-#  WepSIM nodejs engine
-echo "ws_dist/min.wepsim_node.js"
-cat ws_dist/min.sim_all.js \
-    ws_dist/min.wepsim_web.js \
-    wepsim/wepsim_node_core.js \
-    wepsim/wepsim_node_action.js > ws_dist/min.wepsim_node.js
 
-#  external
-echo "ws_dist/min.external.js"
-cat external/popper.min.js \
-    external/bootstrap.min.js \
-    external/knockout-3.5.0.js \
+### Make skeleton
+echo "  Step for inital directory tree:"
+echo "  * ws_dist/..."
+     mkdir -p ws_dist
+     touch    ws_dist/index.html
+     mkdir -p ws_dist/help
+     touch    ws_dist/help/index.html
+
+echo "  * ws_dist/external/..."
+     mkdir -p ws_dist/external
+                                       touch ws_dist/external/index.html
+     cp    -a external/fontawesome           ws_dist/external
+                                       touch ws_dist/external/fontawesome/index.html
+     cp    -a external/dropify               ws_dist/external/
+                                       touch ws_dist/external/dropify/index.html
+     cp    -a external/speechkitt            ws_dist/external/
+                                       touch ws_dist/external/speechkitt/index.html
+     cp    -a external/cordova.js            ws_dist/external/cordova.js
+     cp    -a external/jquery.min.js         ws_dist/external/jquery.min.js
+
+echo "  * ws_dist/docs/..."
+     cp -a docs    ws_dist/
+
+echo "  * ws_dist/images/..."
+     cp -a images  ws_dist/
+
+echo "  * ws_dist/*.sh"
+     cp  docs/manifest.webapp          ws_dist/
+     cp  src/wepsim_nodejs/wepsim.sh   ws_dist/
+     chmod a+x                         ws_dist/*.sh
+
+echo "  * ws_dist/*.html"
+     cp   src/wepsim_web/wepsim_web_classic.html   ws_dist/index.html
+     cp   src/wepsim_web/wepsim_web_classic.html   ws_dist/wepsim-classic.html
+     cp   src/wepsim_web/wepsim_web_compact.html   ws_dist/wepsim-compact.html
+     cp   src/wepsim_web/wepsim_web_null.html      ws_dist/wepsim-null.html
+     cp   src/wepsim_web/wepsim_web_pwa.js         ws_dist/min.wepsim_web_pwa.js
+
+echo "  * ws_dist/help/..."
+for LANG in es en fr kr ja it pt hi zh_cn ru sv de; do
+     cp  src/wepsim_i18n/$LANG/simulator.html      ws_dist/help/simulator-"$LANG".html
+     cp  src/wepsim_i18n/$LANG/about.html          ws_dist/help/about-"$LANG".html
+done
+
+echo "  Done."
+echo ""
+
+
+### Packing
+echo "  Step for packing min.*:"
+
+BASE_DIR=$(dirname $0)/webpack_indexes/
+
+# building cat_indexes/min.wepsim_i18n.js
+    echo "export * from '../../src/wepsim_i18n/i18n.js';"                         > "${BASE_DIR}"/min.wepsim_i18n.js
+    echo ""                                                                      >> "${BASE_DIR}"/min.wepsim_i18n.js
+for LANG in es en fr kr ja it pt hi zh_cn ru sv de; do
+    echo "export * from '../../src/wepsim_i18n/$LANG/gui.js';"                   >> "${BASE_DIR}"/min.wepsim_i18n.js
+    echo "export * from '../../src/wepsim_i18n/$LANG/tutorial-welcome.js';"      >> "${BASE_DIR}"/min.wepsim_i18n.js
+    echo "export * from '../../src/wepsim_i18n/$LANG/tutorial-simpleusage.js';"  >> "${BASE_DIR}"/min.wepsim_i18n.js
+    echo "export * from '../../src/wepsim_i18n/$LANG/tour-intro.js';"            >> "${BASE_DIR}"/min.wepsim_i18n.js
+    echo "export * from '../../src/wepsim_i18n/$LANG/cfg.js';"                   >> "${BASE_DIR}"/min.wepsim_i18n.js
+    echo "export * from '../../src/wepsim_i18n/$LANG/help.js';"                  >> "${BASE_DIR}"/min.wepsim_i18n.js
+    echo "export * from '../../src/wepsim_i18n/$LANG/states.js';"                >> "${BASE_DIR}"/min.wepsim_i18n.js
+    echo "export * from '../../src/wepsim_i18n/$LANG/examples.js';"              >> "${BASE_DIR}"/min.wepsim_i18n.js
+    echo "export * from '../../src/wepsim_i18n/$LANG/compiler.js';"              >> "${BASE_DIR}"/min.wepsim_i18n.js
+    echo "export * from '../../src/wepsim_i18n/$LANG/hw.js';"                    >> "${BASE_DIR}"/min.wepsim_i18n.js
+    echo "export * from '../../src/wepsim_i18n/$LANG/dialogs.js';"               >> "${BASE_DIR}"/min.wepsim_i18n.js
+    echo ""                                                                      >> "${BASE_DIR}"/min.wepsim_i18n.js
+done
+
+# building cat_indexes/min.wepsim_web.js
+echo ""                                        > "${BASE_DIR}"/min.wepsim_web.js
+cat "${BASE_DIR}"/min.sim_all.js              >> "${BASE_DIR}"/min.wepsim_web.js
+cat "${BASE_DIR}"/min.wepsim_i18n.js          >> "${BASE_DIR}"/min.wepsim_web.js
+cat "${BASE_DIR}"/min.wepsim_core.js          >> "${BASE_DIR}"/min.wepsim_web.js
+cat "${BASE_DIR}"/min.wepsim_webui.js         >> "${BASE_DIR}"/min.wepsim_web.js
+
+# building cat_indexes/min.wepsim_node.js
+echo ""                                        > "${BASE_DIR}"/min.wepsim_node.js
+cat "${BASE_DIR}"/min.wepsim_node-begin.js    >> "${BASE_DIR}"/min.wepsim_node.js
+cat "${BASE_DIR}"/min.sim_all.js              >> "${BASE_DIR}"/min.wepsim_node.js
+cat "${BASE_DIR}"/min.wepsim_i18n.js          >> "${BASE_DIR}"/min.wepsim_node.js
+cat "${BASE_DIR}"/min.wepsim_core.js          >> "${BASE_DIR}"/min.wepsim_node.js
+cat "${BASE_DIR}"/min.wepsim_node-end.js      >> "${BASE_DIR}"/min.wepsim_node.js
+
+# building ws_dist/min.*.js
+npm run pack
+
+#  external - codemirror6
+cp devel/external_glue/codemirror.mjs                ./external/codemirror6/codemirror.mjs
+cp devel/external_glue/codemirror.rollup.config.mjs  ./external/codemirror6/rollup.config.mjs
+                         node_modules/.bin/rollup -c ./external/codemirror6/rollup.config.mjs
+terser -o ./external/codemirror6/min.codemirror.js   ./external/codemirror6/codemirror.bundle.js
+rm -fr                                               ./external/codemirror6/codemirror.bundle.js
+
+#  building ws_dist/min.external.js
+echo "  * ws_dist/min.external.js"
+cat external/vue/vue.min.js \
+    external/vue/vuex.min.js \
+    external/popper.min.js \
+    external/bootstrap/bootstrap.min.js \
+    external/bootbox/bootbox.all.min.js \
+    external/tone.min.js \
+    external/codemirror6/min.codemirror.js \
     external/jquery.knob.min.js \
-    external/bootbox.min.js \
-    external/spectrum.min.js \
-    external/timbre.min.js \
-    external/codemirror/codemirror.js \
-    external/codemirror/codemirror.javascript.js \
-    external/codemirror/codemirror.gas.js \
-    external/codemirror/codemirror.keymap/sublime.js \
-    external/codemirror/codemirror.keymap/emacs.js \
-    external/codemirror/codemirror.keymap/vim.js \
-    external/codemirror/codemirror.edit/matchbrackets.js \
-    external/codemirror/codemirror.fold/foldcode.js \
-    external/codemirror/codemirror.fold/foldgutter.js \
-    external/codemirror/codemirror.fold/brace-fold.js \
-    external/codemirror/codemirror.fold/xml-fold.js \
-    external/codemirror/codemirror.fold/comment-fold.js \
-    external/codemirror/codemirror.fold/indent-fold.js \
-    external/codemirror/codemirror.fold/markdown-fold.js \
-    external/codemirror/codemirror.show-hint/codemirror.show-hint.js \
-    external/codemirror/codemirror.runmode/colorize.js \
-    external/vis/vis.min.js \
     external/vis/vis-network.min.js \
-    external/async.js \
+    external/async.min.js \
+    external/compress/lz-string.min.js \
+    external/qrcode/qrcode.min.js \
     external/bootstrap-tokenfield.js \
     external/introjs/introjs.min.js \
     external/speech-input.js \
     external/annyang.min.js \
     external/speechkitt/speechkitt.min.js \
-    external/dropify/dropify.min.js \
-    external/masonry.pkgd.min.js \
-    external/fontawesome/brands.min.js \
-    external/fontawesome/solid.min.js | grep -v sourceMappingURL > ws_dist/min.external.js
+    external/dropify/dropify.min.js | grep -v sourceMappingURL > ws_dist/external.js
+terser --comments -o ws_dist/min.external.js ws_dist/external.js
+rm -fr ws_dist/external.js
 
-echo "ws_dist/min.external.css"
-cat external/bootstrap.min.css \
-    external/bootstrap-theme.min.css \
-    external/dark-mode.css \
-    external/spectrum.min.css \
-    external/codemirror/codemirror.css \
-    external/codemirror/codemirror.theme/blackboard.css \
-    external/codemirror/codemirror.fold/foldgutter.css \
-    external/codemirror/codemirror.show-hint/codemirror.show-hint.css \
-    external/vis/vis.min.css \
+# building ws_dist/min.external.css
+echo "  * ws_dist/min.external.css"
+cat external/bootstrap/bootstrap.min.css \
     external/vis/vis-network.min.css \
     external/bootstrap-tokenfield.css \
     external/introjs/introjs.min.css \
     external/speech-input.css \
     external/dropify/dropify.min.css \
-    external/fontawesome/all.css \
     external/css-tricks.css | grep -v sourceMappingURL > ws_dist/min.external.css
 
-echo "ws_dist/external/..."
-mkdir -p ws_dist/external/fontawesome/
-   touch ws_dist/external/fontawesome/index.html
-cp    -a external/fontawesome/webfonts  ws_dist/external/fontawesome
-                                  touch ws_dist/external/fontawesome/webfonts/index.html
-cp    -a external/dropify               ws_dist/external/
-                                  touch ws_dist/external/dropify/index.html
-cp    -a external/speechkitt            ws_dist/external/
-                                  touch ws_dist/external/speechkitt/index.html
-cp    -a external/cordova.js            ws_dist/external/cordova.js
+echo "  Done."
+echo ""
 
-#  examples, docs, etc.
-echo "ws_dist/examples/..."
-cp -a examples  ws_dist/
-echo "ws_dist/docs/..."
-cp -a docs      ws_dist/
-echo "ws_dist/images/..."
-cp -a images    ws_dist/
 
-#  user interface
-echo "ws_dist/*.html"
-cp   wepsim/wepsim_web_classic.html   ws_dist/index.html
-cp   wepsim/wepsim_web_classic.html   ws_dist/wepsim-classic.html
-cp   wepsim/wepsim_web_compact.html   ws_dist/wepsim-compact.html
-cp   wepsim/wepsim_web_classic.html   ws_dist/wepsim-null.html
-cp   wepsim/wepsim_web_pwa.js         ws_dist/min.wepsim_web_pwa.js
+### Default available examples
+echo "  Step for packing repo/:"
 
-echo "ws_dist/*.sh"
-cp   docs/manifest.webapp  ws_dist/
-cp wepsim/wepsim_node.sh   ws_dist/
-chmod a+x ws_dist/*.sh
+# MIPS
+DEFAULT_EXAMPLE_SET_P1="repo/examples_set/mips/es_ep.json  repo/examples_set/mips/es_ep_native.json"
+DEFAULT_EXAMPLE_SET_P2="repo/examples_set/mips/es_ep2.json repo/examples_set/mips/es_ep2_native.json"
+DEFAULT_EXAMPLE_SET_P3="repo/examples_set/mips/es_poc.json repo/examples_set/mips/es_poc_native.json"
+DEFAULT_EXAMPLE_SET="$DEFAULT_EXAMPLE_SET_P1 $DEFAULT_EXAMPLE_SET_P2 $DEFAULT_EXAMPLE_SET_P3"
+jq 'reduce inputs as $i (.; . += $i)' $DEFAULT_EXAMPLE_SET > repo/examples_set/mips/default.json
+
+# MIPS instructive
+DEFAULT_EXAMPLE_SET="repo/examples_set/mips/es_ep_instructive.json repo/examples_set/mips/es_poc_instructive.json     repo/examples_set/mips/es_ep2_instructive.json"
+jq 'reduce inputs as $i (.; . += $i)' $DEFAULT_EXAMPLE_SET > repo/examples_set/mips/default_instructive.json
+
+# RV32
+DEFAULT_EXAMPLE_SET_P1="repo/examples_set/rv32/es_ep.json  repo/examples_set/rv32/es_ep_native.json"
+DEFAULT_EXAMPLE_SET_P2="repo/examples_set/rv32/es_ep2.json repo/examples_set/rv32/es_ep2_native.json"
+DEFAULT_EXAMPLE_SET_P3="repo/examples_set/rv32/es_poc.json repo/examples_set/rv32/es_poc_native.json"
+DEFAULT_EXAMPLE_SET_P4="repo/examples_set/rv32/es_rv.json"
+DEFAULT_EXAMPLE_SET="$DEFAULT_EXAMPLE_SET_P1 $DEFAULT_EXAMPLE_SET_P2 $DEFAULT_EXAMPLE_SET_P3 $DEFAULT_EXAMPLE_SET_P4"
+jq 'reduce inputs as $i (.; . += $i)' $DEFAULT_EXAMPLE_SET > repo/examples_set/rv32/default.json
+
+# RV32 instructive
+DEFAULT_EXAMPLE_SET="repo/examples_set/rv32/es_ep_instructive.json repo/examples_set/rv32/es_poc_instructive.json     repo/examples_set/rv32/es_ep2_instructive.json"
+jq 'reduce inputs as $i (.; . += $i)' $DEFAULT_EXAMPLE_SET > repo/examples_set/rv32/default_instructive.json
+
+# ARM
+DEFAULT_EXAMPLE_SET="repo/examples_set/arm/es_ep.json          repo/examples_set/arm/es_ep2.json"
+jq 'reduce inputs as $i (.; . += $i)' $DEFAULT_EXAMPLE_SET > repo/examples_set/arm/default.json
+
+# Z80
+DEFAULT_EXAMPLE_SET="repo/examples_set/z80/es_ep.json          repo/examples_set/z80/es_ep2.json"
+jq 'reduce inputs as $i (.; . += $i)' $DEFAULT_EXAMPLE_SET > repo/examples_set/z80/default.json
+
+# OpenCourseWare
+DEFAULT_EXAMPLE_SET="repo/examples_set/mips_ocw/es_ep.json     repo/examples_set/mips_ocw/es_ep2.json"
+jq 'reduce inputs as $i (.; . += $i)' $DEFAULT_EXAMPLE_SET > repo/examples_set/mips_ocw/default.json
+
+# Aula Global (UC3M)
+DEFAULT_EXAMPLE_SET="repo/examples_set/rv32_ag/es_ep.json repo/examples_set/rv32_ag/es_poc.json       repo/examples_set/rv32_ag/es_ep2.json"
+jq 'reduce inputs as $i (.; . += $i)' $DEFAULT_EXAMPLE_SET > repo/examples_set/rv32_ag/default.json
+
+echo "  * ws_dist/repo/..."
+cp -a repo    ws_dist/
+
+echo "  Done."
+echo ""
+
+#  json: update processors
+./ws_dist/wepsim.sh -a export-hardware -m ep  > ws_dist/repo/hardware/ep/hw_def.json
+./ws_dist/wepsim.sh -a export-hardware -m ep2 > ws_dist/repo/hardware/ep2/hw_def.json
+./ws_dist/wepsim.sh -a export-hardware -m poc > ws_dist/repo/hardware/poc/hw_def.json
+./ws_dist/wepsim.sh -a export-hardware -m rv  > ws_dist/repo/hardware/rv/hw_def.json
+
+# the end
+echo "  WepSIM packed in ws_dist (if no error was shown)."
+echo ""
 
